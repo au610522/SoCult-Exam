@@ -1,0 +1,444 @@
+---
+title: "SocKult Exam"
+author: "Josephine S Brunsgaard"
+date: "4/7/2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+setwd("~/Social and cultural dynamics in Cognition/Exam")
+
+library(pacman)
+p_load(tidyverse, 
+       dplyr,
+       tibble,
+       brms)
+
+```
+
+
+```{r}
+#running the function 
+
+g1 <- c(1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,5,4,6,3,6,7,8,4)
+
+sample <- population(N = 28, grouptype = g1, rounds = 10, max_points_pr_round = 10)
+
+
+```
+
+
+
+Creating an ABM which simulite 
+
+```{r the population function}
+# Creating a groups, N has to be the same as group type 
+# g1 <- c(0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,3,4,5,6,7,8,9)
+# N <- 28
+ #rounds <- 10 
+ #grouptype <- g1
+ #max_points_pr_round <- 10
+
+population <- function(N, points, grouptype, rounds, max_points_pr_round){
+  browser()
+  #N is the number of agents
+  #Points is the total amount of expertise points to be distributed
+  #grouptype is a list, created before the 
+  #Rounds is the number of simulations + extra
+  
+  s.points <- data.frame(ID = rep(1:N), start_points = NA)
+  
+  s.points$start_points <- grouptype
+  
+  s.points <- level_start(df = s.points, max_points = max_points_pr_round, N = N)
+
+  df <-  data.frame(ID = rep(1:N, rounds), round = rep(1:rounds, each = N), start_points = s.points$start_points, prev_points = NA, prev_exp_level = NA, current_points = NA, expertise_level = NA, expertise_level_start = s.points$expertise_level_start, group_id =NA, partner = NA, partner_prev_points = NA, partner_level = NA)
+  
+  # Current points in round 1
+
+  r1 <- subset(df, round == 1)
+  r1$current_points <- r1$start_points
+  r1$prev_points <- 0 
+  
+  r_rest <- subset(df, round != 1)
+  
+  df <- rbind(r1, r_rest)
+  
+  # Assign starting level using the level function
+  l1 <- subset(df, round == 1)
+  MP <- max_points_pr_round
+  
+  l1 <- level(df = l1, max_points = MP, N = N)
+  l1$partner <- "non"
+  l1$partner_prev_points <- "non"
+  l1$group_id <- "non"
+  l1$partner_level <- "non"
+  l1$expertise_level_start <- l1$expertise_level
+  l1$prev_exp_level <- "non"
+  
+  l_rest <- subset(df, round != 1)
+  df <- rbind(l1, l_rest)
+  
+
+  # running the round
+  i = 2
+  k = 1
+  
+  for(i in 2:rounds){
+     round <- subset(df, round == i)
+
+     prev_round <- subset(df, round == i-1)
+     
+     ###
+     for (k in 1:N){
+       agent_r <- subset(round, ID == k)
+       agent_pr <- subset(prev_round, ID == k)
+       
+       agent_r$prev_points <- agent_pr$current_points
+       agent_r$prev_exp_level <- agent_pr$expertise_level
+       
+       agent_all <- subset(round, ID != k)
+       
+       round <- rbind(agent_r, agent_all)
+     }
+     
+
+     #round$prev_points <- prev_round$current_points
+     #round$prev_exp_level <- prev_round$expertise_level
+
+     #Adding group ID and partner
+     round <- assign_partner(d = round, N = N)
+     round <- level_partner(df = round, max_points = (i-1)*max_points_pr_round, N = N)
+     #round <- level_start(df=round, max_points = max_points_pr_round, N=N)
+
+     #Assigning current points
+     
+     round <- current_points(round, N = N)
+     
+     round$current_points <- round$current_points+round$prev_points
+
+
+     #Assinging level
+     
+     round <- level(df = round, max_points = i*10, N = N)
+     
+     
+     
+     
+     round_rest <- subset(df, round != i)
+     
+     df <- rbind(round, round_rest)
+  }
+
+  return(df)
+}
+
+# sample <- population(N = 28, grouptype = g1, rounds = 10, max_points_pr_round = 10)
+
+
+
+```
+
+
+```{r - function level}
+### The leveling function
+level <- function(df, max_points, N){
+  
+  # Defining levels
+  low_up <- (max_points*0.30)
+  mid_down <- (max_points*0.30)
+  mid_up <- (max_points*0.60)
+  high_down <- (max_points*0.60)
+  high_up <- (max_points*0.90)
+  top_down <- (max_points*0.90)
+  
+  
+  i <- 1
+  
+  for (i in 1:N){
+    if (df$current_points[i] <= low_up) {
+      df$expertise_level[i] <- "low"
+    }
+    if (df$current_points[i] > mid_down & df$current_points[i] <= mid_up) {
+      df$expertise_level[i] <- "mid"
+    }
+    if (df$current_points[i] > high_down & df$current_points[i] <= high_up) {
+      df$expertise_level[i] <- "high"
+    }
+    if (df$current_points[i] > top_down){
+      df$expertise_level[i] <- "top"
+    }
+  }
+  
+  return(df)}
+
+
+```
+
+
+```{r - function, partner level}
+
+#df <- round
+#i=2
+#max_points <- 10*(i-1)
+
+level_partner <- function(df, max_points, N){
+  #max_points from prev round
+  #browser()
+  
+  # Defining levels
+  low_up <- (max_points*0.30)
+  mid_down <- (max_points*0.30)
+  mid_up <- (max_points*0.60)
+  high_down <- (max_points*0.60)
+  high_up <- (max_points*0.90)
+  top_down <- (max_points*0.90)
+  
+  df$partner_prev_points <- as.numeric(df$partner_prev_points)
+  
+  j <- 1
+  
+  for (j in 1:N){
+    if (df$partner_prev_points[j] <= low_up) {
+      df$partner_level[j] <- "low"
+    }
+    if (df$partner_prev_points[j] > mid_down & df$partner_prev_points[j] <= mid_up) {
+      df$partner_level[j] <- "mid"
+    }
+    if (df$partner_prev_points[j] > high_down & df$partner_prev_points[j] <= high_up) {
+      df$partner_level[j] <- "high"
+    }
+    if (df$partner_prev_points[j] > top_down){
+      df$partner_level[j] <- "top"
+    }
+  }
+  
+  return(df)
+}
+
+```
+
+
+```{r}
+level_start <- function(df, max_points, N){
+  #max_points from prev round
+  #browser()
+  
+  # Defining levels
+  low_up <- (max_points*0.30)
+  mid_down <- (max_points*0.30)
+  mid_up <- (max_points*0.60)
+  high_down <- (max_points*0.60)
+  high_up <- (max_points*0.90)
+  top_down <- (max_points*0.90)
+  
+  df$start_points <- as.numeric(df$start_points)
+  
+  k <- 1
+  
+  for (k in 1:N){
+    if (df$start_points[k] <= low_up) {
+      df$expertise_level_start[k] <- "low"
+    }
+    if (df$start_points[k] > mid_down & df$start_points[k] <= mid_up) {
+      df$expertise_level_start[k] <- "mid"
+    }
+    if (df$start_points[k] > high_down & df$start_points[k] <= high_up) {
+      df$expertise_level_start[k] <- "high"
+    }
+    if (df$start_points[k] > top_down){
+      df$expertise_level_start[k] <- "top"
+    }
+  }
+  
+  return(df)
+}
+```
+
+
+
+
+```{r function, assign partner}
+#N <- 28
+#sample_part <- subset(sample, round == 2)
+
+#d <- sample_part
+
+assign_partner <- function(d, N){
+  #browser()
+  
+  i <- 1
+  
+  #creating group number
+  list1 <- 1:(N/2)
+  list2 <- 1:(N/2)
+  list <- append(list1,list2)
+  
+  #Assigning group id
+  d$group_id <- sample(list, N, replace = F) 
+  
+  ## Adding the partner 
+  
+  for(i in 1:N){
+    x <- subset(d, group_id == group_id[i])
+    
+    x[1,10] <- x[2,1]
+    x[2,10] <- x[1,1]
+    x[1,11] <- x[2,4]
+    x[2,11] <- x[1,4]
+    
+    x_rest <- subset(d, group_id != group_id[i])
+    
+    d <- rbind(x, x_rest)
+  }
+  
+  return(d)
+}
+
+```
+
+
+
+```{r creating probability for learning}
+
+current_points <- function(df, N){
+  #setting the probabilities
+  
+  browser()
+  
+  low_low <- c(0.15, 0.25, 0.25, 0.2, 0.1, 0.04, 0.005, 0.0025, 0.0015, 0.001)
+  low_mid <- c(0.05, 0.15, 0.225, 0.3, 0.2, 0.06, 0.01, 0.0025, 0.0015, 0.001)
+  low_high <- c(0.03, 0.08, 0.20, 0.315, 0.3, 0.06, 0.01, 0.0025, 0.0015, 0.001)
+  low_top <- c(0.01, 0.05, 0.15, 0.35, 0.335, 0.075, 0.025, 0.0025, 0.0015, 0.001)
+  mid_low <- c(0.005, 0.005, 0.015, 0.35, 0.395, 0.2, 0.025, 0.0025, 0.0015, 0.001)
+  mid_mid <- c(0.001, 0.002, 0.012, 0.35, 0.35, 0.25, 0.025, 0.005, 0.0025, 0.0025)
+  mid_high <- c(0.001, 0.002, 0.012, 0.3, 0.35, 0.25, 0.075, 0.005, 0.0025, 0.0025)
+  mid_top <- c(0.001, 0.002, 0.012, 0.3, 0.3, 0.25, 0.125, 0.005, 0.0025, 0.0025)
+  high_low <- c(0.001, 0.002, 0.002, 0.1, 0.125, 0.15, 0.27, 0.24, 0.1, 0.01)
+  high_mid <- c(0.001, 0.002, 0.002, 0.01, 0.1, 0.125, 0.3, 0.256, 0.2, 0.05)
+  high_high <- c(0.001, 0.0015, 0.0025, 0.01, 0.01, 0.01, 0.3, 0.35, 0.3, 0.015)
+  high_top <- c(0.001, 0.001, 0.001, 0.001, 0.001, 0.01, 0.25, 0.3, 0.325, 0.11)
+  top_low <- c(0.001, 0.001, 0.001, 0.002, 0.003, 0.005, 0.01, 0.165, 0.162, 0.65)
+  top_mid <- c(0.001, 0.001, 0.001, 0.001, 0.002, 0.003, 0.004, 0.165, 0.122, 0.7)
+  top_high <- c(0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.007, 0.115, 0.122, 0.75)
+  top_top <- c(0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.118, 0.125, 0.75)
+  
+  
+  df$current_points <- as.numeric(df$current_points)
+  
+  for(k in 1:N){
+  
+    if (df$prev_exp_level[k] == "low"){
+      
+      if (df$partner_level[k] == "low"){
+        x <- sample(10, 1, prob = low_low, replace = T)
+        df$current_points[k] <- x
+        
+      }
+      if (df$partner_level[k] == "mid"){
+        x <- sample(10, 1, prob = low_mid, replace = T)
+        df$current_points[k] <- x
+        
+      }
+      if (df$partner_level[k] == "high"){
+        x <- sample(10, 1, prob = low_high, replace = T)
+        df$current_points[k] <- x
+        
+      }
+      if (df$partner_level[k] == "top"){
+        x <- sample(10, 1, prob = low_top, replace = T)
+        df$current_points[k] <- x
+        
+      }
+    }
+    
+    
+      
+    if (df$prev_exp_level[k] == "mid"){
+      
+      if (df$partner_level[k] == "low"){
+        x <- sample(10, 1, prob = mid_low, replace = T)
+        df$current_points[k] <- x
+        
+      }
+      if (df$partner_level[k] == "mid"){
+        x <- sample(10, 1, prob = mid_mid, replace = T)
+        df$current_points[k] <- x
+        
+      }
+      if (df$partner_level[k] == "high"){
+        x <-sample(10, 1, prob = mid_high, replace = T)
+        df$current_points[k] <- x
+        
+      }
+      if (df$partner_level[k] == "top"){
+        x <- sample(10, 1, prob = mid_top, replace = T)
+        df$current_points[k] <- x
+        
+      }
+    }
+    
+    
+    
+    if (df$prev_exp_level[k] == "high"){
+      
+      if (df$partner_level[k] == "low"){
+        x <- sample(10, 1, prob = high_low, replace = T)
+        df$current_points[k] <- x
+        
+      }
+      if (df$partner_level[k] == "mid"){
+        x <- sample(10, 1, prob = high_mid, replace = T)
+        df$current_points[k] <- x
+        
+      }
+      if (df$partner_level[k] == "high"){
+        x <- sample(10, 1, prob = high_high, replace = T)
+        df$current_points[k] <- x
+        
+      }
+      if (df$partner_level[k] == "top"){
+        x <- sample(10, 1, prob = high_top, replace = T)
+        df$current_points[k] <- x
+        
+      }
+    }
+    
+    if (df$prev_exp_level[k] == "top"){
+      
+      if (df$partner_level[k] == "low"){
+        x <-sample(10, 1, prob = top_low, replace = T)
+        df$current_points[k] <- x
+        
+      }
+      if (df$partner_level[k] == "mid"){
+        x <- sample(10, 1, prob = top_mid, replace = T)
+        df$current_points[k] <- x
+        
+      }
+      if (df$partner_level[k] == "high"){
+        x <- sample(10, 100, prob = top_high, replace = T)
+        df$current_points[k] <- x
+        
+      }
+      if (df$partner_level[k] == "top"){
+        x <- sample(10, 100, prob = top_top, replace = T)
+        df$current_points[k] <- x
+        
+      }
+    }
+  }
+  
+  return(df)
+}
+
+
+#x <-  current_points(round, N = N)
+
+#p <- c(0.1, 0.2, 0.1, 0.1, 0.15, 0.05, 0.05, 0.05, 0.05, 0.05)
+#s.points$start_points <- sample(10, N, prob = prob, replace = T)
+
+
+```

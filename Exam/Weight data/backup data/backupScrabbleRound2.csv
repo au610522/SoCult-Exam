@@ -1,0 +1,434 @@
+V1,Group,Word,Validity,Condition,Participant_1,Participant_2,Round
+0,1,search,1,Type_1,MSL,Mathilde,2.0
+1,1,heal,1,Type_1,MSL,Mathilde,2.0
+2,1,hear,1,Type_1,MSL,Mathilde,2.0
+3,1,race,1,Type_1,MSL,Mathilde,2.0
+4,1,seal,1,Type_1,MSL,Mathilde,2.0
+5,1,real,1,Type_1,MSL,Mathilde,2.0
+6,1,car,1,Type_1,MSL,Mathilde,2.0
+7,1,cars,1,Type_1,MSL,Mathilde,2.0
+8,1,ear,1,Type_1,MSL,Mathilde,2.0
+9,1,eras,1,Type_1,MSL,Mathilde,2.0
+10,1,era,1,Type_1,MSL,Mathilde,2.0
+11,1,ears,1,Type_1,MSL,Mathilde,2.0
+12,1,he,1,Type_1,MSL,Mathilde,2.0
+13,1,sea,1,Type_1,MSL,Mathilde,2.0
+14,1,as,1,Type_1,MSL,Mathilde,2.0
+15,1,hers,1,Type_1,MSL,Mathilde,2.0
+16,1,has,1,Type_1,MSL,Mathilde,2.0
+17,1,case,1,Type_1,MSL,Mathilde,2.0
+18,1,chase,1,Type_1,MSL,Mathilde,2.0
+19,1,arch,1,Type_1,MSL,Mathilde,2.0
+20,1,arches,1,Type_1,MSL,Mathilde,2.0
+21,1,ace,1,Type_1,MSL,Mathilde,2.0
+22,1,aces,1,Type_1,MSL,Mathilde,2.0
+23,1,sale,1,Type_1,MSL,Mathilde,2.0
+24,1,reach,1,Type_1,MSL,Mathilde,2.0
+25,1,laser,1,Type_1,MSL,Mathilde,2.0
+26,1,chase,1,Type_1,MSL,Mathilde,2.0
+27,1,cash,1,Type_1,MSL,Mathilde,2.0
+0,10,sea,1,Type_0,Camilla H,MW,2.0
+1,10,heal,1,Type_0,Camilla H,MW,2.0
+2,10,heals,1,Type_0,Camilla H,MW,2.0
+3,10,car,1,Type_0,Camilla H,MW,2.0
+4,10,cars,1,Type_0,Camilla H,MW,2.0
+5,10,reach,1,Type_0,Camilla H,MW,2.0
+6,10,real,1,Type_0,Camilla H,MW,2.0
+7,10,ache,1,Type_0,Camilla H,MW,2.0
+8,10,leach,1,Type_0,Camilla H,MW,2.0
+9,10,lear,1,Type_0,Camilla H,MW,2.0
+10,10,real,1,Type_0,Camilla H,MW,2.0
+11,10,reals,1,Type_0,Camilla H,MW,2.0
+12,10,she,1,Type_0,Camilla H,MW,2.0
+13,10,he,1,Type_0,Camilla H,MW,2.0
+14,10,shea,1,Type_0,Camilla H,MW,2.0
+15,10,seal,1,Type_0,Camilla H,MW,2.0
+16,10,hear,1,Type_0,Camilla H,MW,2.0
+17,10,hears,1,Type_0,Camilla H,MW,2.0
+18,10,chase,1,Type_0,Camilla H,MW,2.0
+19,10,has,1,Type_0,Camilla H,MW,2.0
+20,10,arse,1,Type_0,Camilla H,MW,2.0
+22,10,search,1,Type_0,Camilla H,MW,2.0
+23,10,leash,1,Type_0,Camilla H,MW,2.0
+24,10,lash,1,Type_0,Camilla H,MW,2.0
+25,10,rash,1,Type_0,Camilla H,MW,2.0
+26,10,cash,1,Type_0,Camilla H,MW,2.0
+27,10,hale,1,Type_0,Camilla H,MW,2.0
+29,10,ear,1,Type_0,Camilla H,MW,2.0
+30,10,lear,1,Type_0,Camilla H,MW,2.0
+31,10,leach,1,Type_0,Camilla H,MW,2.0
+0,11,has,1,Type_1,ABD,RGH,2.0
+1,11,arse,1,Type_1,ABD,RGH,2.0
+4,11,laser,1,Type_1,ABD,RGH,2.0
+5,11,case,1,Type_1,ABD,RGH,2.0
+6,11,race,1,Type_1,ABD,RGH,2.0
+7,11,crash,1,Type_1,ABD,RGH,2.0
+8,11,clash,1,Type_1,ABD,RGH,2.0
+9,11,car,1,Type_1,ABD,RGH,2.0
+10,11,cars,1,Type_1,ABD,RGH,2.0
+11,11,hare,1,Type_1,ABD,RGH,2.0
+12,11,hares,1,Type_1,ABD,RGH,2.0
+13,11,care,1,Type_1,ABD,RGH,2.0
+14,11,hear,1,Type_1,ABD,RGH,2.0
+15,11,cares,1,Type_1,ABD,RGH,2.0
+16,11,seal,1,Type_1,ABD,RGH,2.0
+17,11,real,1,Type_1,ABD,RGH,2.0
+18,11,heal,1,Type_1,ABD,RGH,2.0
+19,11,sea,1,Type_1,ABD,RGH,2.0
+21,11,carl,1,Type_1,ABD,RGH,2.0
+23,11,as,1,Type_1,ABD,RGH,2.0
+24,11,rash,1,Type_1,ABD,RGH,2.0
+26,11,ear,1,Type_1,ABD,RGH,2.0
+27,11,ears,1,Type_1,ABD,RGH,2.0
+28,11,scar,1,Type_1,ABD,RGH,2.0
+29,11,arc,1,Type_1,ABD,RGH,2.0
+30,11,search,1,Type_1,ABD,RGH,2.0
+31,11,reach,1,Type_1,ABD,RGH,2.0
+32,11,leach,1,Type_1,ABD,RGH,2.0
+35,11,lash,1,Type_1,ABD,RGH,2.0
+36,11,cash,1,Type_1,ABD,RGH,2.0
+37,11,rash,1,Type_1,ABD,RGH,2.0
+0,12,case,1,Type_1,Karo,CBC,2.0
+2,12,lace,1,Type_1,Karo,CBC,2.0
+3,12,laces,1,Type_1,Karo,CBC,2.0
+4,12,scar,1,Type_1,Karo,CBC,2.0
+7,12,seal,1,Type_1,Karo,CBC,2.0
+8,12,heal,1,Type_1,Karo,CBC,2.0
+9,12,real,1,Type_1,Karo,CBC,2.0
+10,12,heals,1,Type_1,Karo,CBC,2.0
+11,12,leas,1,Type_1,Karo,CBC,2.0
+12,12,arse,1,Type_1,Karo,CBC,2.0
+13,12,as,1,Type_1,Karo,CBC,2.0
+14,12,acre,1,Type_1,Karo,CBC,2.0
+15,12,acres,1,Type_1,Karo,CBC,2.0
+16,12,as,1,Type_1,Karo,CBC,2.0
+17,12,has,1,Type_1,Karo,CBC,2.0
+18,12,are,1,Type_1,Karo,CBC,2.0
+19,12,er,1,Type_1,Karo,CBC,2.0
+20,12,her,1,Type_1,Karo,CBC,2.0
+21,12,hers,1,Type_1,Karo,CBC,2.0
+22,12,sea,1,Type_1,Karo,CBC,2.0
+23,12,car,1,Type_1,Karo,CBC,2.0
+24,12,cars,1,Type_1,Karo,CBC,2.0
+25,12,sheal,1,Type_1,Karo,CBC,2.0
+26,12,she,1,Type_1,Karo,CBC,2.0
+28,12,laser,1,Type_1,Karo,CBC,2.0
+29,12,race,1,Type_1,Karo,CBC,2.0
+30,12,races,1,Type_1,Karo,CBC,2.0
+32,12,sel,1,Type_1,Karo,CBC,2.0
+33,12,ras,1,Type_1,Karo,CBC,2.0
+34,12,shea,1,Type_1,Karo,CBC,2.0
+35,12,ear,1,Type_1,Karo,CBC,2.0
+36,12,ears,1,Type_1,Karo,CBC,2.0
+37,12,hear,1,Type_1,Karo,CBC,2.0
+38,12,hears,1,Type_1,Karo,CBC,2.0
+39,12,sac,1,Type_1,Karo,CBC,2.0
+42,12,reals,1,Type_1,Karo,CBC,2.0
+1,13,races,1,Type_1,stine,MLP,2.0
+2,13,lace,1,Type_1,stine,MLP,2.0
+3,13,laces,1,Type_1,stine,MLP,2.0
+4,13,race,1,Type_1,stine,MLP,2.0
+5,13,races,1,Type_1,stine,MLP,2.0
+6,13,car,1,Type_1,stine,MLP,2.0
+7,13,cars,1,Type_1,stine,MLP,2.0
+8,13,shale,1,Type_1,stine,MLP,2.0
+9,13,care,1,Type_1,stine,MLP,2.0
+10,13,cares,1,Type_1,stine,MLP,2.0
+11,13,heal,1,Type_1,stine,MLP,2.0
+12,13,case,1,Type_1,stine,MLP,2.0
+13,13,seal,1,Type_1,stine,MLP,2.0
+14,13,real,1,Type_1,stine,MLP,2.0
+15,13,hare,1,Type_1,stine,MLP,2.0
+16,13,hares,1,Type_1,stine,MLP,2.0
+17,13,sear,1,Type_1,stine,MLP,2.0
+18,13,sea,1,Type_1,stine,MLP,2.0
+19,13,seal,1,Type_1,stine,MLP,2.0
+20,13,ace,1,Type_1,stine,MLP,2.0
+21,13,aces,1,Type_1,stine,MLP,2.0
+22,13,crash,1,Type_1,stine,MLP,2.0
+24,13,ale,1,Type_1,stine,MLP,2.0
+26,13,arc,1,Type_1,stine,MLP,2.0
+27,13,arcs,1,Type_1,stine,MLP,2.0
+29,13,arch,1,Type_1,stine,MLP,2.0
+32,13,ear,1,Type_1,stine,MLP,2.0
+33,13,ears,1,Type_1,stine,MLP,2.0
+34,13,earl,1,Type_1,stine,MLP,2.0
+35,13,earl,1,Type_1,stine,MLP,2.0
+36,13,earls,1,Type_1,stine,MLP,2.0
+37,13,chase,1,Type_1,stine,MLP,2.0
+39,13,arse,1,Type_1,stine,MLP,2.0
+0,2,real,1,Type_0,Mads,ML,2.0
+1,2,sea,1,Type_0,Mads,ML,2.0
+2,2,seal,1,Type_0,Mads,ML,2.0
+3,2,heal,1,Type_0,Mads,ML,2.0
+4,2,heals,1,Type_0,Mads,ML,2.0
+5,2,case,1,Type_0,Mads,ML,2.0
+6,2,hear,1,Type_0,Mads,ML,2.0
+7,2,hears,1,Type_0,Mads,ML,2.0
+8,2,chase,1,Type_0,Mads,ML,2.0
+9,2,clear,1,Type_0,Mads,ML,2.0
+10,2,clears,1,Type_0,Mads,ML,2.0
+11,2,has,1,Type_0,Mads,ML,2.0
+12,2,ale,1,Type_0,Mads,ML,2.0
+13,2,ales,1,Type_0,Mads,ML,2.0
+15,2,real,1,Type_0,Mads,ML,2.0
+16,2,ace,1,Type_0,Mads,ML,2.0
+17,2,aces,1,Type_0,Mads,ML,2.0
+18,2,lace,1,Type_0,Mads,ML,2.0
+19,2,laces,1,Type_0,Mads,ML,2.0
+20,2,share,1,Type_0,Mads,ML,2.0
+21,2,scare,1,Type_0,Mads,ML,2.0
+22,2,scar,1,Type_0,Mads,ML,2.0
+23,2,car,1,Type_0,Mads,ML,2.0
+24,2,cars,1,Type_0,Mads,ML,2.0
+26,2,carl,1,Type_0,Mads,ML,2.0
+27,2,leach,1,Type_0,Mads,ML,2.0
+28,2,sear,1,Type_0,Mads,ML,2.0
+29,2,race,1,Type_0,Mads,ML,2.0
+30,2,races,1,Type_0,Mads,ML,2.0
+31,2,lace,1,Type_0,Mads,ML,2.0
+32,2,laser,1,Type_0,Mads,ML,2.0
+33,2,shea,1,Type_0,Mads,ML,2.0
+34,2,sec,1,Type_0,Mads,ML,2.0
+35,2,rec,1,Type_0,Mads,ML,2.0
+36,2,real,1,Type_0,Mads,ML,2.0
+37,2,char,1,Type_0,Mads,ML,2.0
+38,2,crash,1,Type_0,Mads,ML,2.0
+39,2,lash,1,Type_0,Mads,ML,2.0
+40,2,rash,1,Type_0,Mads,ML,2.0
+42,2,cash,1,Type_0,Mads,ML,2.0
+43,2,sea,1,Type_0,Mads,ML,2.0
+44,2,acre,1,Type_0,Mads,ML,2.0
+0,3,search,1,Type_0,Soeren,SGT,2.0
+1,3,race,1,Type_0,Soeren,SGT,2.0
+2,3,chase,1,Type_0,Soeren,SGT,2.0
+3,3,races,1,Type_0,Soeren,SGT,2.0
+4,3,case,1,Type_0,Soeren,SGT,2.0
+5,3,care,1,Type_0,Soeren,SGT,2.0
+6,3,cares,1,Type_0,Soeren,SGT,2.0
+7,3,reach,1,Type_0,Soeren,SGT,2.0
+8,3,car,1,Type_0,Soeren,SGT,2.0
+9,3,cars,1,Type_0,Soeren,SGT,2.0
+11,3,lase,1,Type_0,Soeren,SGT,2.0
+12,3,lacer,1,Type_0,Soeren,SGT,2.0
+13,3,laser,1,Type_0,Soeren,SGT,2.0
+14,3,hear,1,Type_0,Soeren,SGT,2.0
+15,3,ear,1,Type_0,Soeren,SGT,2.0
+16,3,ears,1,Type_0,Soeren,SGT,2.0
+17,3,her,1,Type_0,Soeren,SGT,2.0
+18,3,she,1,Type_0,Soeren,SGT,2.0
+19,3,he,1,Type_0,Soeren,SGT,2.0
+20,3,hes,1,Type_0,Soeren,SGT,2.0
+21,3,chase,1,Type_0,Soeren,SGT,2.0
+22,3,sear,1,Type_0,Soeren,SGT,2.0
+24,3,seal,1,Type_0,Soeren,SGT,2.0
+25,3,leach,1,Type_0,Soeren,SGT,2.0
+0,4,sea,1,Type_1,KL,CKB,2.0
+2,4,car,1,Type_1,KL,CKB,2.0
+4,4,laser,1,Type_1,KL,CKB,2.0
+7,4,car,1,Type_1,KL,CKB,2.0
+8,4,cars,1,Type_1,KL,CKB,2.0
+9,4,sel,1,Type_1,KL,CKB,2.0
+10,4,seal,1,Type_1,KL,CKB,2.0
+11,4,rash,1,Type_1,KL,CKB,2.0
+12,4,cash,1,Type_1,KL,CKB,2.0
+13,4,case,1,Type_1,KL,CKB,2.0
+15,4,ace,1,Type_1,KL,CKB,2.0
+16,4,real,1,Type_1,KL,CKB,2.0
+17,4,hear,1,Type_1,KL,CKB,2.0
+18,4,search,1,Type_1,KL,CKB,2.0
+19,4,race,1,Type_1,KL,CKB,2.0
+20,4,races,1,Type_1,KL,CKB,2.0
+21,4,crash,1,Type_1,KL,CKB,2.0
+22,4,arch,1,Type_1,KL,CKB,2.0
+23,4,arches,1,Type_1,KL,CKB,2.0
+25,4,ear,1,Type_1,KL,CKB,2.0
+26,4,ears,1,Type_1,KL,CKB,2.0
+27,4,earl,1,Type_1,KL,CKB,2.0
+28,4,earls,1,Type_1,KL,CKB,2.0
+29,4,care,1,Type_1,KL,CKB,2.0
+30,4,hare,1,Type_1,KL,CKB,2.0
+31,4,hares,1,Type_1,KL,CKB,2.0
+0,5,search,1,Type_0,Line,Sim,2.0
+1,5,race,1,Type_0,Line,Sim,2.0
+2,5,races,1,Type_0,Line,Sim,2.0
+3,5,laser,1,Type_0,Line,Sim,2.0
+4,5,case,1,Type_0,Line,Sim,2.0
+5,5,car,1,Type_0,Line,Sim,2.0
+6,5,cars,1,Type_0,Line,Sim,2.0
+7,5,her,1,Type_0,Line,Sim,2.0
+8,5,hers,1,Type_0,Line,Sim,2.0
+9,5,arse,1,Type_0,Line,Sim,2.0
+10,5,sale,1,Type_0,Line,Sim,2.0
+11,5,scale,1,Type_0,Line,Sim,2.0
+12,5,heal,1,Type_0,Line,Sim,2.0
+13,5,heals,1,Type_0,Line,Sim,2.0
+14,5,seal,1,Type_0,Line,Sim,2.0
+15,5,chase,1,Type_0,Line,Sim,2.0
+16,5,ace,1,Type_0,Line,Sim,2.0
+17,5,aces,1,Type_0,Line,Sim,2.0
+18,5,crash,1,Type_0,Line,Sim,2.0
+19,5,lash,1,Type_0,Line,Sim,2.0
+20,5,rash,1,Type_0,Line,Sim,2.0
+21,5,cash,1,Type_0,Line,Sim,2.0
+25,5,as,1,Type_0,Line,Sim,2.0
+26,5,ear,1,Type_0,Line,Sim,2.0
+27,5,ears,1,Type_0,Line,Sim,2.0
+28,5,are,1,Type_0,Line,Sim,2.0
+29,5,hare,1,Type_0,Line,Sim,2.0
+30,5,hares,1,Type_0,Line,Sim,2.0
+0,6,has,1,Type_0,KRV,Julie,2.0
+1,6,seal,1,Type_0,KRV,Julie,2.0
+2,6,sel,1,Type_0,KRV,Julie,2.0
+3,6,sale,1,Type_0,KRV,Julie,2.0
+4,6,laser,1,Type_0,KRV,Julie,2.0
+5,6,carl,1,Type_0,KRV,Julie,2.0
+6,6,search,1,Type_0,KRV,Julie,2.0
+7,6,arse,1,Type_0,KRV,Julie,2.0
+8,6,case,1,Type_0,KRV,Julie,2.0
+9,6,lase,1,Type_0,KRV,Julie,2.0
+10,6,race,1,Type_0,KRV,Julie,2.0
+11,6,races,1,Type_0,KRV,Julie,2.0
+12,6,hear,1,Type_0,KRV,Julie,2.0
+13,6,hears,1,Type_0,KRV,Julie,2.0
+14,6,sea,1,Type_0,KRV,Julie,2.0
+16,6,clear,1,Type_0,KRV,Julie,2.0
+17,6,clears,1,Type_0,KRV,Julie,2.0
+18,6,hale,1,Type_0,KRV,Julie,2.0
+19,6,scar,1,Type_0,KRV,Julie,2.0
+20,6,scare,1,Type_0,KRV,Julie,2.0
+21,6,es,1,Type_0,KRV,Julie,2.0
+22,6,res,1,Type_0,KRV,Julie,2.0
+23,6,chase,1,Type_0,KRV,Julie,2.0
+24,6,car,1,Type_0,KRV,Julie,2.0
+25,6,cars,1,Type_0,KRV,Julie,2.0
+26,6,el,1,Type_0,KRV,Julie,2.0
+27,6,heal,1,Type_0,KRV,Julie,2.0
+28,6,heals,1,Type_0,KRV,Julie,2.0
+32,6,ale,1,Type_0,KRV,Julie,2.0
+33,6,ales,1,Type_0,KRV,Julie,2.0
+34,6,rec,1,Type_0,KRV,Julie,2.0
+35,6,recs,1,Type_0,KRV,Julie,2.0
+36,6,search,1,Type_0,KRV,Julie,2.0
+37,6,he,1,Type_0,KRV,Julie,2.0
+38,6,her,1,Type_0,KRV,Julie,2.0
+39,6,hers,1,Type_0,KRV,Julie,2.0
+41,6,hare,1,Type_0,KRV,Julie,2.0
+42,6,hares,1,Type_0,KRV,Julie,2.0
+43,6,share,1,Type_0,KRV,Julie,2.0
+44,6,she,1,Type_0,KRV,Julie,2.0
+0,7,chase,1,Type_1,1,tsls2,2.0
+2,7,hare,1,Type_1,1,tsls2,2.0
+4,7,chear,1,Type_1,1,tsls2,2.0
+5,7,sea,1,Type_1,1,tsls2,2.0
+6,7,race,1,Type_1,1,tsls2,2.0
+7,7,races,1,Type_1,1,tsls2,2.0
+8,7,hear,1,Type_1,1,tsls2,2.0
+9,7,hears,1,Type_1,1,tsls2,2.0
+10,7,her,1,Type_1,1,tsls2,2.0
+11,7,he,1,Type_1,1,tsls2,2.0
+13,7,car,1,Type_1,1,tsls2,2.0
+14,7,cars,1,Type_1,1,tsls2,2.0
+15,7,share,1,Type_1,1,tsls2,2.0
+16,7,res,1,Type_1,1,tsls2,2.0
+17,7,rec,1,Type_1,1,tsls2,2.0
+18,7,recs,1,Type_1,1,tsls2,2.0
+19,7,sec,1,Type_1,1,tsls2,2.0
+20,7,lace,1,Type_1,1,tsls2,2.0
+21,7,laces,1,Type_1,1,tsls2,2.0
+22,7,ear,1,Type_1,1,tsls2,2.0
+23,7,ears,1,Type_1,1,tsls2,2.0
+24,7,hears,1,Type_1,1,tsls2,2.0
+25,7,seal,1,Type_1,1,tsls2,2.0
+27,7,hale,1,Type_1,1,tsls2,2.0
+28,7,ace,1,Type_1,1,tsls2,2.0
+29,7,aces,1,Type_1,1,tsls2,2.0
+30,7,heal,1,Type_1,1,tsls2,2.0
+31,7,heals,1,Type_1,1,tsls2,2.0
+32,7,ale,1,Type_1,1,tsls2,2.0
+33,7,ales,1,Type_1,1,tsls2,2.0
+34,7,case,1,Type_1,1,tsls2,2.0
+35,7,care,1,Type_1,1,tsls2,2.0
+36,7,cares,1,Type_1,1,tsls2,2.0
+37,7,leash,1,Type_1,1,tsls2,2.0
+40,7,scale,1,Type_1,1,tsls2,2.0
+41,7,scar,1,Type_1,1,tsls2,2.0
+42,7,sale,1,Type_1,1,tsls2,2.0
+43,7,sal,1,Type_1,1,tsls2,2.0
+44,7,real,1,Type_1,1,tsls2,2.0
+0,8,chase,1,Type_1,Sebastian,MHFA,2.0
+1,8,car,1,Type_1,Sebastian,MHFA,2.0
+2,8,cars,1,Type_1,Sebastian,MHFA,2.0
+3,8,sale,1,Type_1,Sebastian,MHFA,2.0
+4,8,seal,1,Type_1,Sebastian,MHFA,2.0
+5,8,case,1,Type_1,Sebastian,MHFA,2.0
+7,8,race,1,Type_1,Sebastian,MHFA,2.0
+8,8,races,1,Type_1,Sebastian,MHFA,2.0
+9,8,lace,1,Type_1,Sebastian,MHFA,2.0
+10,8,laces,1,Type_1,Sebastian,MHFA,2.0
+11,8,rash,1,Type_1,Sebastian,MHFA,2.0
+13,8,heal,1,Type_1,Sebastian,MHFA,2.0
+14,8,heals,1,Type_1,Sebastian,MHFA,2.0
+16,8,hare,1,Type_1,Sebastian,MHFA,2.0
+17,8,hares,1,Type_1,Sebastian,MHFA,2.0
+18,8,care,1,Type_1,Sebastian,MHFA,2.0
+19,8,cares,1,Type_1,Sebastian,MHFA,2.0
+20,8,her,1,Type_1,Sebastian,MHFA,2.0
+21,8,her,1,Type_1,Sebastian,MHFA,2.0
+22,8,hers,1,Type_1,Sebastian,MHFA,2.0
+23,8,cash,1,Type_1,Sebastian,MHFA,2.0
+24,8,cars,1,Type_1,Sebastian,MHFA,2.0
+25,8,carse,1,Type_1,Sebastian,MHFA,2.0
+26,8,real,1,Type_1,Sebastian,MHFA,2.0
+27,8,share,1,Type_1,Sebastian,MHFA,2.0
+29,8,search,1,Type_1,Sebastian,MHFA,2.0
+30,8,clear,1,Type_1,Sebastian,MHFA,2.0
+31,8,hear,1,Type_1,Sebastian,MHFA,2.0
+32,8,hears,1,Type_1,Sebastian,MHFA,2.0
+33,8,share,1,Type_1,Sebastian,MHFA,2.0
+34,8,leash,1,Type_1,Sebastian,MHFA,2.0
+35,8,sear,1,Type_1,Sebastian,MHFA,2.0
+36,8,case,1,Type_1,Sebastian,MHFA,2.0
+37,8,arch,1,Type_1,Sebastian,MHFA,2.0
+38,8,ale,1,Type_1,Sebastian,MHFA,2.0
+39,8,arc,1,Type_1,Sebastian,MHFA,2.0
+40,8,arse,1,Type_1,Sebastian,MHFA,2.0
+41,8,ear,1,Type_1,Sebastian,MHFA,2.0
+42,8,ears,1,Type_1,Sebastian,MHFA,2.0
+43,8,era,1,Type_1,Sebastian,MHFA,2.0
+44,8,eras,1,Type_1,Sebastian,MHFA,2.0
+45,8,acres,1,Type_1,Sebastian,MHFA,2.0
+1,9,has,1,Type_1,Oli,Camilla Andersen,2.0
+3,9,scar,1,Type_1,Oli,Camilla Andersen,2.0
+4,9,case,1,Type_1,Oli,Camilla Andersen,2.0
+7,9,seal,1,Type_1,Oli,Camilla Andersen,2.0
+8,9,heal,1,Type_1,Oli,Camilla Andersen,2.0
+9,9,real,1,Type_1,Oli,Camilla Andersen,2.0
+10,9,lace,1,Type_1,Oli,Camilla Andersen,2.0
+11,9,laser,1,Type_1,Oli,Camilla Andersen,2.0
+14,9,case,1,Type_1,Oli,Camilla Andersen,2.0
+15,9,race,1,Type_1,Oli,Camilla Andersen,2.0
+17,9,hale,1,Type_1,Oli,Camilla Andersen,2.0
+18,9,haler,1,Type_1,Oli,Camilla Andersen,2.0
+19,9,reach,1,Type_1,Oli,Camilla Andersen,2.0
+20,9,leach,1,Type_1,Oli,Camilla Andersen,2.0
+21,9,reach,1,Type_1,Oli,Camilla Andersen,2.0
+22,9,car,1,Type_1,Oli,Camilla Andersen,2.0
+23,9,cars,1,Type_1,Oli,Camilla Andersen,2.0
+25,9,hear,1,Type_1,Oli,Camilla Andersen,2.0
+26,9,hears,1,Type_1,Oli,Camilla Andersen,2.0
+27,9,ear,1,Type_1,Oli,Camilla Andersen,2.0
+28,9,ears,1,Type_1,Oli,Camilla Andersen,2.0
+29,9,era,1,Type_1,Oli,Camilla Andersen,2.0
+30,9,eras,1,Type_1,Oli,Camilla Andersen,2.0
+31,9,res,1,Type_1,Oli,Camilla Andersen,2.0
+32,9,real,1,Type_1,Oli,Camilla Andersen,2.0
+33,9,char,1,Type_1,Oli,Camilla Andersen,2.0
+34,9,chars,1,Type_1,Oli,Camilla Andersen,2.0
+35,9,search,1,Type_1,Oli,Camilla Andersen,2.0
+38,9,her,1,Type_1,Oli,Camilla Andersen,2.0
+39,9,hers,1,Type_1,Oli,Camilla Andersen,2.0
+40,9,he,1,Type_1,Oli,Camilla Andersen,2.0
+41,9,hes,1,Type_1,Oli,Camilla Andersen,2.0
+42,9,reach,1,Type_1,Oli,Camilla Andersen,2.0
+44,9,sea,1,Type_1,Oli,Camilla Andersen,2.0

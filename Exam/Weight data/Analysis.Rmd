@@ -1,0 +1,210 @@
+---
+title: "Weights for the ABM"
+author: "Josephine S Brunsgaard"
+date: "4/15/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r DATA CLEANING}
+library(pacman, lmerTest)
+p_load(ggplot2, lmerTest, tidyverse, reshape2)
+
+setwd("~/Social and cultural dynamics in Cognition/Exam/Weight data")
+
+d1 <- read.csv("ScrabbleRound1.csv")
+d2 <- read.csv("ScrabbleRound2.csv")
+d3 <- read.csv("ScrabbleRound3.csv")
+
+#removing participants who did not do all trials
+ d1 <- d1 %>% subset(Participant !=  "Participant_8" & Participant != "Participant_12" & Participant != "Participant_24" & Participant != "Participant_30" & Participant != "Participant_22" & Participant != "Participant_5" & Participant != "Participant_11")
+ 
+d2 <- d2 %>% subset(Group !=  "2" & Group != "3" & Group != "4")
+
+d3 <- d3 %>% subset(Participant != "Participant_30"& Participant != "Participant_22" & Participant != "Participant_5" & Participant != "Participant_11")
+
+# Level 1 = 0 -60 
+# Level 3 = 0 - 80 
+
+#Top: 10 %  = TOP KARAKTER (12)
+#High: 30 %    = (7, 10)
+#Mid: 30 %    = (02, 4)
+#Low: 30 %  = NOT PASSED (-3, 00)
+
+#word count from 0 to 60
+# 0-18: Low 
+# 19-36: Medium
+# 37-54: High
+# 55-60: Top 
+
+#word count from 0 to 80
+# 0-24: Low 
+# 25-48: Medium
+# 49-72: High
+# 73-80: Top 
+
+
+#Round 1
+d_new1 <- d1 %>% 
+  group_by(Participant, Group) %>% 
+  count(Validity)
+
+d_new1$Round1 <- d_new1$n
+
+dfLow <- d_new1 %>% 
+  subset(Round1 < 19)
+dfLow$Level1 <- "Low"
+
+dfMid <- d_new1 %>% 
+  subset(Round1 > 18 & Round1 < 37)
+dfMid$Level1 <- "Mid"
+
+dfHigh <- d_new1 %>% 
+  subset(Round1 > 36 & Round1 < 55)
+dfHigh$Level1 <- "High"
+
+
+dfnew <- rbind(dfLow, dfMid)
+dfnew <- rbind(dfnew, dfHigh)
+
+d_new1 <- dfnew
+
+d_new1 <- d_new1[,-c(2,3,4)]
+
+# Round 2
+d_new2 <- d2 %>% 
+  group_by(Group, Participant_1, Participant_2) %>% 
+  count(Validity)
+
+
+# Adding Partner 
+new <- d_new2
+names(new)[names(new)=="Participant_1"] <- "Participant_3"
+names(new)[names(new)=="Participant_2"] <- "Participant_1"
+names(new)[names(new)=="Participant_3"] <- "Participant_2"
+
+d_new2 <- rbind(new, d_new2)
+
+names(d_new2)[names(d_new2)=="Participant_1"] <- "Participant"
+names(d_new2)[names(d_new2)=="Participant_2"] <- "Partner"
+
+d_new2 <-d_new2[,-c(4,5)]
+
+
+# Merging 1 and 2
+
+new <- merge(d_new2, d_new1, by.x="Participant", by.y="Participant")
+
+#Adding Partner Round 1
+p1 <- d_new1
+names(p1)[names(p1)=="Participant"] <- "Partner"
+names(p1)[names(p1)=="Level1"] <- "PartnerLevel1"
+names(p1)[names(p1)=="Round1"] <- "PartnerRound1"
+
+new <- merge(new, p1, by.x = "Partner", by.y = "Partner")
+
+
+# Round 3 
+d_new3 <- d3 %>% 
+  group_by(Participant, Group) %>% 
+  count(Validity)
+
+d_new3$Round3 <- d_new3$n
+d_new3 <- d_new3[,-c(4,3)]
+
+
+# Adding levels 
+dfLow <- d_new3 %>% 
+  subset(Round3 < 25)
+
+dfLow$Level3 <- "Low"
+
+dfMid <- d_new3 %>% 
+  subset(Round3 > 24 & Round3 < 49)
+
+dfMid$Level3 <- "Mid"
+
+dfHigh <- d_new3 %>% 
+  subset(Round3 > 48 & Round3 < 73)
+
+dfHigh$Level3 <- "High"
+
+dfTop <- d_new3 %>% 
+  subset(Round3 > 72)
+
+dfTop$Level3 <- "Top"
+
+dfnew <- rbind(dfLow, dfMid)
+dfnew <- rbind(dfnew, dfHigh)
+dfnew <- rbind(dfnew, dfTop)
+
+d_new3 <- dfnew
+
+x <- merge(d_new2, d_new3, by.x="Participant", by.y="Participant")
+
+
+#Adding partner level
+
+p3 <- d_new3
+names(p3)[names(p3)=="Participant"] <- "Partner"
+names(p3)[names(p3)=="Level3"] <- "PartnerLevel3"
+names(p3)[names(p3)=="Round3"] <- "PartnerRound3"
+
+x <- merge(x, p3, by.x = "Partner", by.y = "Partner")
+
+
+# adding round 3
+d <- merge(new, x, by.x="Participant", by.y="Participant")
+
+
+## Cleaning the dataframe 
+
+d <- d[,c(1:7, 11,12,14,15)]
+
+write.csv(d, file = "CleanData.csv")
+```
+
+```{r Analysis}
+library(pacman, lmerTest)
+p_load(ggplot2, lmerTest, tidyverse, reshape2)
+
+setwd("~/Social and cultural dynamics in Cognition/Exam/Weight data")
+
+d <- read.csv("CleanData.csv")
+
+
+low <- subset(d, Level1 == "Low")
+low_low<- subset(low, PartnerLevel1 == "Low")
+low_mid <- subset(low, PartnerLevel1 == "Mid")
+low_high <- subset(low, PartnerLevel1 == "High")
+low_top <- subset(low, PartnerLevel1 == "Top")
+
+mid <- subset(d, Level1 == "Mid")
+mid_low<- subset(mid, PartnerLevel1 == "Low")
+mid_mid <- subset(mid, PartnerLevel1 == "Mid")
+mid_high <- subset(mid, PartnerLevel1 == "High")
+mid_top <- subset(low, PartnerLevel1 == "Top")
+
+high <- subset(d, Level1 == "High")
+high_low<- subset(high, PartnerLevel1 == "Low")
+high_mid <- subset(high, PartnerLevel1 == "Mid")
+high_high <- subset(high, PartnerLevel1 == "High")
+high_top <- subset(high, PartnerLevel1 == "Top")
+
+top <- subset(d, Level1 == "Top")
+top_low<- subset(high, PartnerLevel1 == "Low")
+top_mid <- subset(high, PartnerLevel1 == "Mid")
+top_high <- subset(high, PartnerLevel1 == "High")
+top_top <- subset(high, PartnerLevel1 == "Top")
+
+
+d$change <- (d$Round3 - d$Round1)
+d$change_pro <- d$change/d$Round1 * 100
+
+
+```
+
+

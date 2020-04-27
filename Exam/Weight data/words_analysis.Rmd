@@ -1,0 +1,463 @@
+---
+title: "II_exp"
+author: "Me"
+date: "14/2/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(pacman)
+p_load(data.table,dplyr,dtplyr,effects,ggplot2,lmerTest,MuMIn)
+
+#checking = read.csv(file = "/Users/SergioGlez/Dropbox/2017_SocCult/1.words/check.csv", sep=",")
+checking = read.csv(file = "/Users/semrf/Dropbox/My courses/2017 - SocCult/2w_1words/check.csv", sep=",")
+
+
+###FIRST PART ANALYSIS
+
+#merge all files
+files <- list.files(path = "/Users/semrf/Dropbox/My courses/2017 - SocCult/2w_1words/data/",pattern = ".csv")
+#files <- list.files(path = "/Users/SergioGlez/Dropbox/2017_SocCult/2w_1words/data/",pattern = ".csv")
+#setwd("/Users/SergioGlez/Dropbox/2017_SocCult/2w_1words/data/")
+setwd("/Users/semrf/Dropbox/My courses/2017 - SocCult/2w_1words/data/")
+temp <- lapply(files, fread, sep=",")
+all_words <- rbindlist( temp )
+
+#basic modificaionts
+all_words$Participant <-factor(all_words$Participant) #change variable into factor
+all_words$Round <-factor(all_words$Round) #change variable into factor
+all_words$Validity_fac <-factor(all_words$Validity) #change variable into factor
+
+all_words = all_words[all_words$Validity ==1]
+
+length = length(unique(all_words$Participant))
+
+no_reps =data.frame(V1 = numeric(0),Participant = character(0),Word = character(0), Validity = numeric(0),Validity_fac = numeric(0),Round =numeric(0),stringsAsFactors=TRUE)
+
+#delete rows with repeated words
+for (t in unique(all_words$Participant)){
+    NR=all_words[all_words$Participant == t]
+    NR=NR[!duplicated(NR[,'Word']), ]
+    no_reps = rbind(NR,no_reps)
+}
+
+#empty dataframe to write to count:
+Totals = data.frame(Participant = rep(NA,length),Total_words = rep(NA,length), stringsAsFactors=TRUE)
+
+#count
+count = 1
+for (p in unique(no_reps$Participant)){
+    Totals$Participant[count] = p
+    Totals$Total_words[count] = (nrow(no_reps[no_reps$Participant==p]))
+    count = count+1
+}
+
+length2 =(length(combn(length,2)))/2
+
+comparisons = data.frame(Participant1 = rep(NA,length2),Participant2 = rep(NA,length2),Same_words = rep(NA,length2),Same_words_ratio = rep(NA,length2),Performance_sim = rep(NA,length2), Higher = rep(NA,length2),stringsAsFactors=TRUE)
+
+count = 1
+for (q in unique(no_reps$Participant)){
+  for (o in unique(no_reps$Participant)){
+    if (q == o){
+      next
+    } else {
+        if (q %in% comparisons$Participant2 & o %in% comparisons$Participant1){
+        next
+          }else{
+              dif = length(intersect(no_reps$Word[no_reps$Participant == q],no_reps$Word[no_reps$Participant == o]))
+              samewords_ratio=dif/(length(no_reps$Word[no_reps$Participant == q])+length(no_reps$Word[no_reps$Participant == o]))
+              comparisons$Participant1[count] = q
+              comparisons$Participant2[count] = o
+              comparisons$Same_words[count] = dif
+              comparisons$Same_words_ratio[count] = samewords_ratio
+              if (Totals$Total_words[Totals$Participant ==q] >= Totals$Total_words[Totals$Participant ==o]){
+                bigN = Totals$Total_words[Totals$Participant ==q]
+                smallN = Totals$Total_words[Totals$Participant ==o]
+                comparisons$Performance_sim[count] = bigN/smallN
+                comparisons$Higher[count] = Totals$Participant[Totals$Participant ==q]
+              } else {
+                bigN = Totals$Total_words[Totals$Participant ==o]
+                smallN = Totals$Total_words[Totals$Participant ==q]
+                comparisons$Performance_sim[count] = bigN/smallN
+                comparisons$Higher[count] = Totals$Participant[Totals$Participant ==o]
+              }
+              count = count+1
+    }
+  }
+  }
+}
+comparisons = arrange(comparisons,Performance_sim,Same_words)
+
+pairs = data.frame(Participant1 = rep(NA,(length/2)),Participant2 = rep(NA,(length/2)),Condition = rep(NA,(length/2)),Group_number = rep(NA,(length/2)), Same_words=rep(NA,(length/2)),Same_words_ratio = rep(NA,(length/2)),Performance_sim=rep(NA,(length/2)), Round = rep(1,(length/2)),Higher = rep(1,(length/2)),stringsAsFactors=TRUE)
+
+#useless loop so far
+count=1
+for (l in 1:nrow(comparisons)){
+if (l%%2==0){
+  comparisons = arrange(comparisons,-row_number())
+  if ((comparisons$Participant1[l-1] %in% pairs$Participant1)|(comparisons$Participant1[l-1] %in% pairs$Participant2)){
+    next
+  }else{
+    if ((comparisons$Participant2[l-1] %in% pairs$Participant1)|(comparisons$Participant2[l-1] %in% pairs$Participant2)){
+      next
+    }else{
+        pairs$Participant1[count] = comparisons$Participant1[l-1]
+        pairs$Participant2[count] = comparisons$Participant2[l-1]
+        pairs$Same_words[count] = comparisons$Same_words[l-1]
+        pairs$Same_words_ratio[count] = comparisons$Same_words_ratio[l-1]
+        pairs$Performance_sim[count] = comparisons$Performance_sim[l-1]
+        pairs$Higher[count] = comparisons$Higher[l-1]
+        pairs$Condition[count] = 0
+        pairs$Group_number[count] = count
+        count = count+1
+    }
+  }
+}else{
+  comparisons = arrange(comparisons,-row_number())
+  if (l<2){
+    if((comparisons$Participant1[l] %in% pairs$Participant2)|(comparisons$Participant1[l] %in% pairs$Participant1)){
+      next
+    }else{
+      if ((comparisons$Participant2[l] %in% pairs$Participant2)|(comparisons$Participant2[l] %in% pairs$Participant1)){
+        next
+      }else{
+        pairs$Participant1[count] = comparisons$Participant1[l]
+        pairs$Participant2[count] = comparisons$Participant2[l]
+        pairs$Same_words[count] = comparisons$Same_words[l]
+        pairs$Same_words_ratio[count]=comparisons$Same_words_ratio[l]
+        pairs$Higher[count] = comparisons$Higher[l]
+        pairs$Performance_sim[count] = comparisons$Performance_sim[l]
+        pairs$Condition[count] = 1
+        pairs$Group_number[count] = count
+        count = count+1
+    }
+  }}else{
+    if((comparisons$Participant1[l-1] %in% pairs$Participant2)|(comparisons$Participant1[l-1] %in% pairs$Participant1)){
+      next
+    }else{
+      if ((comparisons$Participant2[l-1] %in% pairs$Participant2)|(comparisons$Participant2[l-1] %in% pairs$Participant1)){
+        next
+      }else{
+        pairs$Participant1[count] = comparisons$Participant1[l-1]
+        pairs$Participant2[count] = comparisons$Participant2[l-1]
+        pairs$Same_words[count] = comparisons$Same_words[l-1]
+        pairs$Same_words_ratio[count]=comparisons$Same_words_ratio[l-1]
+        pairs$Higher[count] = comparisons$Higher[l-1]
+        pairs$Performance_sim[count] = comparisons$Performance_sim[l-1]
+        pairs$Condition[count] = 1
+        pairs$Group_number[count] = count
+        count = count+1
+      }
+    }
+
+  }
+}}
+  
+### SECOND PART ANALYSIS
+### SECOND PART ANALYSIS
+### SECOND PART ANALYSIS
+### SECOND PART ANALYSIS
+### SECOND PART ANALYSIS
+### SECOND PART ANALYSIS
+### SECOND PART ANALYSIS
+
+#merge all files
+#files <- list.files(path = "/Users/SergioGlez/Dropbox/2017_SocCult/2w_1words/data2/",pattern = ".csv")
+#setwd("/Users/SergioGlez/Dropbox/2017_SocCult/2w_1words/data2/")
+files <- list.files(path = "/Users/semrf/Dropbox/My courses/2017 - SocCult/2w_1words/data2/",pattern = ".csv")
+setwd("/Users/semrf/Dropbox/My courses/2017 - SocCult/2w_1words/data2/")
+temp <- lapply(files, fread, sep=",")
+all_words2 <- rbindlist(temp)
+
+#basic modificaionts
+all_words2$Participant_1 <-factor(all_words2$Participant_1) #change variable into factor
+all_words2$Participant_2 <-factor(all_words2$Participant_2) #change variable into factor
+all_words2$Group <-factor(all_words2$Group) #change variable into factor
+all_words2$Condition <-factor(all_words2$Condition) #change variable into factor
+all_words2$Validity_fac <-factor(all_words2$Validity) #change variable into factor
+
+all_words2 = all_words2[all_words2$Validity ==1]
+
+no_reps2 =data.frame(V1 = numeric(0),Group = character(0),Word = character(0), Validity = numeric(0),Validity_fac = numeric(0),Condition= numeric(0),Participant_1= numeric(0),Participant_2= numeric(0),stringsAsFactors=TRUE)
+
+#delete rows with repeated words
+for (t in unique(all_words2$Group)){
+    NR2=all_words2[all_words2$Group == t]
+    NR2=NR2[!duplicated(NR2[,'Word']), ]
+    no_reps2 = rbind(NR2,no_reps2)
+}
+
+n_pairs = nrow(pairs)
+#n_pairs = 13
+Totals2 = data.frame(Group = rep(NA,n_pairs),Total_words = rep(NA,n_pairs),Condition = rep(NA,n_pairs),Same_words =rep(NA,n_pairs),Diversity = rep(NA,n_pairs),Similarity=rep(NA,n_pairs),CollectiveBenefit=rep(NA,n_pairs), stringsAsFactors=TRUE)
+
+#count
+count = 1
+for (p in unique(no_reps2$Group)){
+    Totals2$Group[count] = p
+    Totals2$Total_words[count] = (nrow(no_reps2[no_reps2$Group==p]))
+    Totals2$Same_words[count] = pairs$Same_words[pairs$Group_number==p]
+    Totals2$Diversity[count] = 1-pairs$Same_words_ratio[pairs$Group_number==p]
+    Totals2$Condition[count] = no_reps2$Condition[no_reps2$Group==p]
+    Totals2$Similarity[count] = pairs$Performance_sim[pairs$Group_number==p]
+    Totals2$CollectiveBenefit[count]=Totals$Total_words[Totals$Participant==pairs$Higher[pairs$Group_number==p]]/Totals2$Total_words[count]
+    count = count+1
+}
+
+model1 = glm(Total_words~Condition,Totals2,family=poisson)
+summary(model1)
+model1_2 = lm(CollectiveBenefit~Condition,Totals2)
+summary(model1_2)
+
+model2 = lm(CollectiveBenefit~(Same_words+Similarity),Totals2)
+summary(model2)
+model2_a1 = lm(CollectiveBenefit~(Diversity),Totals2)
+model2_a = lm(CollectiveBenefit~(Diversity+Similarity),Totals2)
+summary(model2_a)
+
+
+model2_3= lm(Diversity~Similarity, Totals2)
+summary(model2_3)
+model2_4= lm(Same_words~Similarity, Totals2)
+summary(model2_4)
+
+### THIRD PART ANALYSIS
+### THIRD PART ANALYSIS
+### THIRD PART ANALYSIS
+### THIRD PART ANALYSIS
+### THIRD PART ANALYSIS
+### THIRD PART ANALYSIS
+### THIRD PART ANALYSIS
+### THIRD PART ANALYSIS
+### THIRD PART ANALYSIS
+
+#merge all files
+#files <- list.files(path = "/Users/SergioGlez/Dropbox/2017_SocCult/2w_1words/data3/",pattern = ".csv")
+#setwd("/Users/SergioGlez/Dropbox/2017_SocCult/2w_1words/data3/")
+files <- list.files(path = "/Users/semrf/Dropbox/My courses/2017 - SocCult/2w_1words/data3/",pattern = ".csv")
+setwd("/Users/semrf/Dropbox/My courses/2017 - SocCult/2w_1words/data3/")
+temp <- lapply(files, fread, sep=",")
+all_words3 <- rbindlist( temp )
+
+#basic modificaionts
+all_words3$Participant <-factor(all_words3$Participant) #change variable into factor
+all_words3$Round <-factor(all_words3$Round) #change variable into factor
+all_words3$Validity_fac <-factor(all_words3$Validity) #change variable into factor
+all_words3$Group <-factor(all_words3$Group)
+
+all_words3 = all_words3[all_words3$Validity ==1]
+
+length = length(unique(all_words$Participant))
+
+no_reps3 =data.frame(V1 = numeric(0),Participant = character(0),Word = character(0), Validity = numeric(0),Validity_fac = numeric(0),Round =numeric(0),Group = character(0), Condition = character(0), stringsAsFactors=TRUE)
+
+#delete rows with repeated words
+for (t in unique(all_words3$Participant)){
+    NR=all_words3[all_words3$Participant == t]
+    NR=NR[!duplicated(NR[,'Word']), ]
+    no_reps3 = rbind(NR,no_reps3)
+}
+
+#empty dataframe to write to count:
+Totals3 = data.frame(Participant = rep(NA,length),Total_words = rep(NA,length), stringsAsFactors=TRUE)
+
+#count
+count = 1
+for (p in unique(no_reps3$Participant)){
+    Totals3$Participant[count] = p
+    Totals3$Total_words[count] = (nrow(no_reps3[no_reps3$Participant==p]))
+    count = count+1
+}
+
+comparisons3 = data.frame(Participant1 = rep(NA,length2),Participant2 = rep(NA,length2),Same_words = rep(NA,length2),Same_words_ratio = rep(NA,length2),Performance_sim = rep(NA,length2), stringsAsFactors=TRUE)
+
+
+count = 1
+for (q in unique(no_reps3$Participant)){
+  for (o in unique(no_reps3$Participant)){
+    if (q == o){
+      next
+    } else {
+        if (q %in% comparisons3$Participant2 & o %in% comparisons3$Participant1){
+        next
+          }else{
+              dif = length(intersect(no_reps3$Word[no_reps3$Participant == q],no_reps3$Word[no_reps3$Participant == o]))
+              samewordratio= dif/(length(no_reps3$Word[no_reps3$Participant == q])+length(no_reps3$Word[no_reps3$Participant == o]))
+              comparisons3$Participant1[count] = q
+              comparisons3$Participant2[count] = o
+              comparisons3$Same_words[count] = dif
+              comparisons3$Same_words_ratio[count] = samewordratio
+              if (Totals3$Total_words[Totals3$Participant ==q] >= Totals3$Total_words[Totals3$Participant ==o]){
+                bigN = Totals3$Total_words[Totals3$Participant ==q]
+                smallN = Totals3$Total_words[Totals3$Participant ==o]
+                comparisons3$Performance_sim[count] = bigN/smallN
+              } else {
+                bigN = Totals3$Total_words[Totals3$Participant ==o]
+                smallN = Totals3$Total_words[Totals3$Participant ==q]
+                comparisons3$Performance_sim[count] = bigN/smallN
+              }
+              count = count+1
+    }
+  }
+  }
+}
+print(comparisons3$Performance_sim[comparisons3$Participant1 == pairs$Participant1[3] & comparisons3$Participant2 == pairs$Participant2[3]])
+
+length3 = n_pairs*2
+totals_compared = data.frame(Participant1 = rep(NA,length3),Participant2 = rep(NA,length3),Same_words = rep(NA,length3),Same_words_ratio = rep(NA,length3),Performance_sim = rep(NA,length3),Round = rep(NA,length3), Condition = rep(NA,length3),Group_number = rep(NA,length3),stringsAsFactors=TRUE)
+
+count=1
+for (n in 1:n_pairs){
+  totals_compared$Participant1[n]=pairs$Participant1[n]
+  totals_compared$Participant2[n]=pairs$Participant2[n]
+  totals_compared$Same_words[n]=pairs$Same_words[n]
+  totals_compared$Same_words_ratio[n]=pairs$Same_words_ratio[n]
+  totals_compared$Performance_sim[n]=pairs$Performance_sim[n]
+  totals_compared$Round[n]=1
+  totals_compared$Condition[n]=pairs$Condition[n]
+  totals_compared$Group_number[n]=pairs$Group_number[n]
+  
+  
+  totals_compared$Participant1[n+n_pairs]= totals_compared$Participant1[n]
+  totals_compared$Participant2[n+n_pairs]=totals_compared$Participant2[n]
+  totals_compared$Same_words[n+n_pairs]= comparisons3$Same_words[comparisons3$Participant1 == totals_compared$Participant1[n] & comparisons3$Participant2 == totals_compared$Participant2[n]]
+  totals_compared$Same_words_ratio[n+n_pairs]= comparisons3$Same_words_ratio[comparisons3$Participant1 == totals_compared$Participant1[n] & comparisons3$Participant2 == totals_compared$Participant2[n]]
+  totals_compared$Performance_sim[n+n_pairs]=comparisons3$Performance_sim[comparisons3$Participant1 == totals_compared$Participant1[n] & comparisons3$Participant2 == totals_compared$Participant2[n]]
+  totals_compared$Round[n+n_pairs]=2
+  totals_compared$Condition[n+n_pairs]= pairs$Condition[n]
+  totals_compared$Group_number[n+n_pairs]=pairs$Group_number[n]
+  }
+totals_compared=rename(totals_compared,Similarity=Performance_sim,Diversity=Same_words_ratio)
+totals_compared$Diversity=1-totals_compared$Diversity
+
+model3 = lmer(Similarity~Round+(1|Group_number),totals_compared,REML = F)
+summary(model3)
+
+model4 = lmer(Same_words~Round+(1|Group_number),totals_compared,REML = F)
+summary(model4)
+model4_2 = lmer(Diversity~Round+(1|Group_number),totals_compared,REML = F)
+summary(model4_2)
+
+Totals2$Diversity2=Totals2$Diversity
+Totals2$Diversity=1/Totals2$Same_words
+
+# Crucial tests of our hypotheses:
+# H0: are groups better than the best of individuals? Is collective benefit > 1?
+modelH0=lm(CollectiveBenefit-1~1,Totals2)
+summary(modelH0) # Nope
+# H1: Is similarity a predictor of collective benefit
+modelH1=lm(CollectiveBenefit~Similarity,Totals2)
+summary(modelH1) # Yeps
+# H2: Is diversity a predictor of collective benefit
+modelH2=lm(CollectiveBenefit~Diversity,Totals2)
+summary(modelH2) # Nope
+modelH2=lm(CollectiveBenefit~Same_words,Totals2)
+summary(modelH2) # Nope
+# H2a: What if we add similarity?
+modelH2a=lm(CollectiveBenefit~Similarity+Diversity,Totals2)
+summary(modelH2a) # Nope
+modelH2a=lm(CollectiveBenefit~Similarity+Same_words,Totals2)
+summary(modelH2a) # Nope
+# H2b: has the manipulation worked?
+modelH2b=lm(CollectiveBenefit~Condition,Totals2)
+summary(modelH2b)  # Nope
+# H2c: sanity check: has the manipulation affected similarity and diversity?
+modelH2c=lm(Similarity~Condition,Totals2)
+summary(modelH2c)  # Nope
+modelH2d=lm(Diversity~Condition,Totals2)
+summary(modelH2d)  # Nope
+modelH2d=glm(Same_words~Condition,Totals2, family=poisson)
+summary(modelH2d)  # Nope
+# H3: has similarity/diversity changed as an effect of collaboration?
+modelH3=lmer(Diversity~Round+(1|Group_number),totals_compared)
+summary(modelH3)  # Yeps
+modelH3=lmer(Similarity~Round+(1|Group_number),totals_compared)
+summary(modelH3)  # Nope
+
+
+##creating anonymous and clean final whole datasets:
+##creating anonymous and clean final whole datasets:
+##creating anonymous and clean final whole datasets:
+##creating anonymous and clean final whole datasets:
+##creating anonymous and clean final whole datasets:
+all_first_round = read.csv(file = "/Users/SergioGlez/Dropbox/2017_SocCult/2w_1words/ScrabbleRound1.csv", sep=",",stringsAsFactors=FALSE)
+all_second_round = read.csv(file = "/Users/SergioGlez/Dropbox/2017_SocCult/2w_1words/ScrabbleRound2.csv", sep=",",stringsAsFactors=FALSE)
+all_third_round = read.csv(file = "/Users/SergioGlez/Dropbox/2017_SocCult/2w_1words/ScrabbleRound3.csv", sep=",",stringsAsFactors=FALSE)
+
+all_second_round$Participant_1[all_second_round$Participant_1=='Soeren'] ='soeren'
+
+count =1
+for (t in unique(all_first_round$Participant)){
+  all_third_round$Participant[all_third_round$Participant ==t]=paste('Participant_',toString(count),sep="")
+  if (t %in% all_second_round$Participant_1){
+    all_second_round$Participant_1[all_second_round$Participant_1 ==t] =paste('Participant_',toString(count),sep="")
+  }else{
+    all_second_round$Participant_2[all_second_round$Participant_2 ==t] =paste('Participant_',toString(count),sep="")
+  }
+  all_first_round$Participant[all_first_round$Participant==t] = paste('Participant_',toString(count),sep="")
+  count = count+1}
+
+all_second_round$Participant_2[all_second_round$Participant_2=='ML']='Participant_30'
+
+all_first_round$Group = 'nan'
+for (r in unique(all_first_round$Participant)){
+  if (r %in% all_second_round$Participant_1){
+    all_first_round$Group[all_first_round$Participant==r]=all_second_round$Group[all_second_round$Participant_1==r]
+  }else{
+    if (r %in% all_second_round$Participant_2){
+      all_first_round$Group[all_first_round$Participant==r]=all_second_round$Group[all_second_round$Participant_2==r]
+    }else{
+      next
+    }}}
+
+write.csv(all_first_round, file = "/Users/SergioGlez/Dropbox/2017_SocCult/2w_1words/ScrabbleRound1.csv")
+write.csv(all_second_round, file = "/Users/SergioGlez/Dropbox/2017_SocCult/2w_1words/ScrabbleRound2.csv")
+write.csv(all_third_round, file = "/Users/SergioGlez/Dropbox/2017_SocCult/2w_1words/ScrabbleRound3.csv")
+
+```
+
+## Bayes analysis
+```{r}
+M1 <- map(
+    alist(
+        CollectiveBenefit ~ dnorm( mu , sigma ) ,
+        mu <- a,
+        a <- dnorm( 1 , 1 ) ,
+        sigma ~ dunif( 0 , 10 )
+    ),
+    data=Totals2)
+
+M2 <- map(
+    alist(
+        CollectiveBenefit ~ dnorm( mu , sigma ) ,
+        mu <- a + bDiv*Diversity ,
+        a ~ dnorm( 1 , 1 ) ,
+        bDiv ~ dnorm( 0 , 1 ) ,
+        sigma ~ dunif( 0 , 10 )
+    ),
+    data=Totals2)
+
+M3 <- map(
+    alist(
+        CollectiveBenefit ~ dnorm( mu , sigma ) ,
+        mu <- a + bSim* Similarity,
+        a ~ dnorm( 1 , 1 ) ,
+        bSim ~ dnorm( 0 , 1 ) ,
+        sigma ~ dunif( 0 , 10 )
+    ),
+    data=Totals2)
+
+M4 <- map(
+    alist(
+        CollectiveBenefit ~ dnorm( mu , sigma ) ,
+        mu <- a + bDiv*Diversity +bSim* Similarity,
+        a ~ dnorm( 1 , 1 ) ,
+        bDiv ~ dnorm( 0 , 1 ) ,
+        bSim ~ dnorm( 0 , 1 ) ,
+        sigma ~ dunif( 0 , 10 )
+    ),
+    data=Totals2)
+
+```
+
