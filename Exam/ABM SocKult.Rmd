@@ -3,12 +3,13 @@ title: "SocKult Exam"
 author: "Josephine S Brunsgaard"
 date: "4/7/2020"
 output: word_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-setwd("~/Social and cultural dynamics in Cognition/Exam")
 
 library(pacman)
 p_load(tidyverse, 
@@ -16,18 +17,66 @@ p_load(tidyverse,
        tibble,
        brms)
 
+p_load(truncnorm)
+
 ```
+
+
+```{r plotting}
+```
+
+
 
 
 ```{r}
 #running the function 
 
-g1 <- c(1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,5,4,6,3,6,7,8,4)
+# Summing up to 140 since we want a mean of 5 and have 28 agents
 
-sample <- population(N = 28, grouptype = g1, rounds = 10, max_points_pr_round = 10)
+g1 <- c(5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5) # all in the middle
+g2 <- c(5, 2, 5, 5, 4, 6, 6, 5, 6, 6 ,4, 5, 5, 6, 7, 4, 5, 4, 3, 5, 6, 6, 5, 5, 4, 6, 6, 4) # mean of 5, sd of 1.08
+g3 <- c(6, 6, 5, 3, 4, 10, 1, 4, 6, 7, 4, 4, 2, 4, 8, 5, 7, 3, 9, 5, 3, 5, 5, 2, 8, 7, 2, 5) # rnorm - sd 2.2
+g4 <-c(1, 1, 1, 2, 2, 2, 3, 3, 3,4, 4, 4, 4, 5,5, 5, 5, 6, 6,6 ,7, 7, 8, 8,9, 9, 10, 10) #mean = 5, most with low expertise, uniform
+g5 <- c(1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,9,9,9,9,9,9,9,9,9,9,9,10, 10) # no middle, bimodal
 
+
+groups <- cbind(g1,g2, g3, g4, g5)
+
+complete <- simulation(N = 28, rounds = 10, max_points_pr_round = 10, groups = groups,n_groups = 5, sim_pr_group = 5)
+```
+
+```{r simulation function}
+
+simulation <- function(N, rounds, max_points_pr_round, groups, n_groups, sim_pr_group){
+  
+  #state grouptype 
+  #browser()
+  df <- data.frame()
+  
+  group <- groups
+  
+  for (j in 1:n_groups){
+    
+    
+    
+    for (i in 1:sim_pr_group){
+      current <- population(N=N, grouptype = group[,j], rounds = rounds, max_points_pr_round = max_points_pr_round, sim_nr = i)
+      
+      current$ID <- current$ID + j*1000
+      
+      current$group_type <- j
+      
+      df <- rbind(df, current)
+    }
+  }
+  
+  
+  
+  return(df)
+}
 
 ```
+
 
 
 
@@ -41,8 +90,8 @@ Creating an ABM which simulite
  #grouptype <- g1
  #max_points_pr_round <- 10
 
-population <- function(N, points, grouptype, rounds, max_points_pr_round){
-  browser()
+population <- function(N, points, grouptype, rounds, max_points_pr_round, sim_nr){
+  #browser()
   #N is the number of agents
   #Points is the total amount of expertise points to be distributed
   #grouptype is a list, created before the 
@@ -55,6 +104,8 @@ population <- function(N, points, grouptype, rounds, max_points_pr_round){
   s.points <- level_start(df = s.points, max_points = max_points_pr_round, N = N)
 
   df <-  data.frame(ID = rep(1:N, rounds), round = rep(1:rounds, each = N), start_points = s.points$start_points, prev_points = NA, prev_exp_level = NA, current_points = NA, expertise_level = NA, expertise_level_start = s.points$expertise_level_start, group_id =NA, partner = NA, partner_prev_points = NA, partner_level = NA)
+  
+  df$ID <- df$ID + 100*sim_nr
   
   # Current points in round 1
 
@@ -84,7 +135,8 @@ population <- function(N, points, grouptype, rounds, max_points_pr_round){
 
   # running the round
   i = 2
-  k = 1
+  k = 1 + 100 * sim_nr
+  kn <- k + N
   
   for(i in 2:rounds){
      round <- subset(df, round == i)
@@ -92,14 +144,14 @@ population <- function(N, points, grouptype, rounds, max_points_pr_round){
      prev_round <- subset(df, round == i-1)
      
      ###
-     for (k in 1:N){
-       agent_r <- subset(round, ID == k)
-       agent_pr <- subset(prev_round, ID == k)
+     for (j in k:kn){
+       agent_r <- subset(round, ID == j)
+       agent_pr <- subset(prev_round, ID == j)
        
        agent_r$prev_points <- agent_pr$current_points
        agent_r$prev_exp_level <- agent_pr$expertise_level
        
-       agent_all <- subset(round, ID != k)
+       agent_all <- subset(round, ID != j)
        
        round <- rbind(agent_r, agent_all)
      }
@@ -109,7 +161,7 @@ population <- function(N, points, grouptype, rounds, max_points_pr_round){
      #round$prev_exp_level <- prev_round$expertise_level
 
      #Adding group ID and partner
-     round <- assign_partner(d = round, N = N)
+     round <- assign_partner(df = round, N = N)
      round <- level_partner(df = round, max_points = (i-1)*max_points_pr_round, N = N)
      #round <- level_start(df=round, max_points = max_points_pr_round, N=N)
 
@@ -198,20 +250,20 @@ level_partner <- function(df, max_points, N){
   
   df$partner_prev_points <- as.numeric(df$partner_prev_points)
   
-  j <- 1
+  i <- 1
   
-  for (j in 1:N){
-    if (df$partner_prev_points[j] <= low_up) {
-      df$partner_level[j] <- "low"
+  for (i in 1:N){
+    if (df$partner_prev_points[i] <= low_up) {
+      df$partner_level[i] <- "low"
     }
-    if (df$partner_prev_points[j] > mid_down & df$partner_prev_points[j] <= mid_up) {
-      df$partner_level[j] <- "mid"
+    if (df$partner_prev_points[i] > mid_down & df$partner_prev_points[i] <= mid_up) {
+      df$partner_level[i] <- "mid"
     }
-    if (df$partner_prev_points[j] > high_down & df$partner_prev_points[j] <= high_up) {
-      df$partner_level[j] <- "high"
+    if (df$partner_prev_points[i] > high_down & df$partner_prev_points[i] <= high_up) {
+      df$partner_level[i] <- "high"
     }
-    if (df$partner_prev_points[j] > top_down){
-      df$partner_level[j] <- "top"
+    if (df$partner_prev_points[i] > top_down){
+      df$partner_level[i] <- "top"
     }
   }
   
@@ -261,12 +313,13 @@ level_start <- function(df, max_points, N){
 
 
 ```{r function, assign partner}
-#N <- 28
+N <- 28
+sim_nr <- 1
 #sample_part <- subset(sample, round == 2)
 
 #d <- sample_part
 
-assign_partner <- function(d, N){
+assign_partner <- function(df, N){
   #browser()
   
   i <- 1
@@ -277,24 +330,27 @@ assign_partner <- function(d, N){
   list <- append(list1,list2)
   
   #Assigning group id
-  d$group_id <- sample(list, N, replace = F) 
+  df$group_id <- sample(list, N, replace = F) 
   
   ## Adding the partner 
   
   for(i in 1:N){
-    x <- subset(d, group_id == group_id[i])
+    x <- subset(df, group_id == group_id[i])
     
+    # adding partner
     x[1,10] <- x[2,1]
     x[2,10] <- x[1,1]
+    
+    #
     x[1,11] <- x[2,4]
     x[2,11] <- x[1,4]
     
-    x_rest <- subset(d, group_id != group_id[i])
+    x_rest <- subset(df, group_id != group_id[i])
     
-    d <- rbind(x, x_rest)
+    df <- rbind(x, x_rest)
   }
   
-  return(d)
+  return(df)
 }
 
 ```
@@ -306,7 +362,7 @@ assign_partner <- function(d, N){
 current_points <- function(df, N){
   #setting the probabilities
   
-  browser()
+  #browser()
   
   low_low <- c(0.15, 0.25, 0.25, 0.2, 0.1, 0.04, 0.005, 0.0025, 0.0015, 0.001)
   low_mid <- c(0.05, 0.15, 0.225, 0.3, 0.2, 0.06, 0.01, 0.0025, 0.0015, 0.001)
