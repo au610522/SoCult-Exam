@@ -29,6 +29,8 @@ p_load(truncnorm)
 
 
 ```{r}
+#running the function 
+
 # Summing up to 140 since we want a mean of 5 and have 28 agents
 
 g1 <- c(5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5) # all in the middle
@@ -37,9 +39,8 @@ g3 <- c(6, 6, 5, 3, 4, 10, 1, 4, 6, 7, 4, 4, 2, 4, 8, 5, 7, 3, 9, 5, 3, 5, 5, 2,
 g4 <-c(1, 1, 1, 2, 2, 2, 3, 3, 3,4, 4, 4, 4, 5,5, 5, 5, 6, 6,6 ,7, 7, 8, 8,9, 9, 10, 10) #mean = 5, most with low expertise, uniform
 g5 <- c(1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,9,9,9,9,9,9,9,9,9,9,9,10, 10) # no middle, bimodal
 
+
 groups <- cbind(g1,g2, g3, g4, g5)
-
-
 
 complete <- simulation(N = 28, rounds = 10, max_points_pr_round = 10, groups = groups,n_groups = 5, sim_pr_group = 5)
 ```
@@ -358,31 +359,27 @@ assign_partner <- function(df, N){
 
 ```{r creating probability for learning}
 
-
 current_points <- function(df, N){
   #setting the probabilities
   
   #browser()
   
-  weight <- readRDS("weight.rds")
-  
-  
-  low_low <- weight$low_low
-  low_mid <- weight$low_mid
-  low_high <- weight$low_high
-  low_top <- weight$low_top
-  mid_low <- weight$mid_low
-  mid_mid <- weight$mid_mid
-  mid_high <- weight$mid_high
-  mid_top <- weight$mid_top
-  high_low <- weight$high_low
-  high_mid <- weight$high_mid
-  high_high <- weight$high_high
-  high_top <- weight$high_top
-  top_low <- weight$top_low
-  top_mid <- weight$top_mid
-  top_high <- weight$top_high
-  top_top <- weight$top_top
+  low_low <- c(0.15, 0.25, 0.25, 0.2, 0.1, 0.04, 0.005, 0.0025, 0.0015, 0.001)
+  low_mid <- c(0.05, 0.15, 0.225, 0.3, 0.2, 0.06, 0.01, 0.0025, 0.0015, 0.001)
+  low_high <- c(0.03, 0.08, 0.20, 0.315, 0.3, 0.06, 0.01, 0.0025, 0.0015, 0.001)
+  low_top <- c(0.01, 0.05, 0.15, 0.35, 0.335, 0.075, 0.025, 0.0025, 0.0015, 0.001)
+  mid_low <- c(0.005, 0.005, 0.015, 0.35, 0.395, 0.2, 0.025, 0.0025, 0.0015, 0.001)
+  mid_mid <- c(0.001, 0.002, 0.012, 0.35, 0.35, 0.25, 0.025, 0.005, 0.0025, 0.0025)
+  mid_high <- c(0.001, 0.002, 0.012, 0.3, 0.35, 0.25, 0.075, 0.005, 0.0025, 0.0025)
+  mid_top <- c(0.001, 0.002, 0.012, 0.3, 0.3, 0.25, 0.125, 0.005, 0.0025, 0.0025)
+  high_low <- c(0.001, 0.002, 0.002, 0.1, 0.125, 0.15, 0.27, 0.24, 0.1, 0.01)
+  high_mid <- c(0.001, 0.002, 0.002, 0.01, 0.1, 0.125, 0.3, 0.256, 0.2, 0.05)
+  high_high <- c(0.001, 0.0015, 0.0025, 0.01, 0.01, 0.01, 0.3, 0.35, 0.3, 0.015)
+  high_top <- c(0.001, 0.001, 0.001, 0.001, 0.001, 0.01, 0.25, 0.3, 0.325, 0.11)
+  top_low <- c(0.001, 0.001, 0.001, 0.002, 0.003, 0.005, 0.01, 0.165, 0.162, 0.65)
+  top_mid <- c(0.001, 0.001, 0.001, 0.001, 0.002, 0.003, 0.004, 0.165, 0.122, 0.7)
+  top_high <- c(0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.007, 0.115, 0.122, 0.75)
+  top_top <- c(0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.118, 0.125, 0.75)
   
   
   df$current_points <- as.numeric(df$current_points)
@@ -478,12 +475,12 @@ current_points <- function(df, N){
         
       }
       if (df$partner_level[k] == "high"){
-        x <- sample(10, 1, prob = top_high, replace = T)
+        x <- sample(10, 100, prob = top_high, replace = T)
         df$current_points[k] <- x
         
       }
       if (df$partner_level[k] == "top"){
-        x <- sample(10, 1, prob = top_top, replace = T)
+        x <- sample(10, 100, prob = top_top, replace = T)
         df$current_points[k] <- x
         
       }
@@ -893,9 +890,7 @@ top_low <- d %>%
 }
   
 
- # a <- rep_weights(n=n, sim_nr = 1, n_level = 10, repitions = 2000)
-
-# only run if we need more to support the weights 
+a <- rep_weights(n=n, sim_nr = 1, n_level = 10, repitions = 2000)
 
 
 weight <- a  #### plus mere hvis vi kører flere
@@ -918,6 +913,9 @@ weight$top_low <- weight$top_low / sum(weight$top_low)
 weight$top_mid <- weight$top_mid / sum(weight$top_mid)
 weight$top_high <- weight$top_hig / sum(weight$top_hig)
 weight$top_top <- weight$top_top / sum(weight$top_top)
+
+
+weight1 <- weight
 
 saveRDS(weight, file = "weight.rds")
 
