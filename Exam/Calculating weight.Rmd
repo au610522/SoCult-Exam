@@ -1,0 +1,442 @@
+---
+title: "Weights"
+author: "Josephine S Brunsgaard"
+date: "5/4/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(pacman)
+p_load(tidyverse, 
+       dplyr,
+       tibble,
+       brms)
+
+p_load(truncnorm)
+```
+
+## Creating the weights and saving them
+
+```{r creating the list}
+ 
+n1 <- c(rep(0,9), rep(1,1))
+n2 <- c(rep(0,8), rep(1,2))
+n3 <- c(rep(0,7), rep(1,3))
+n4 <- c(rep(0,6), rep(1,4))
+n5 <- c(rep(0,5), rep(1,5))
+n6 <- c(rep(0,4), rep(1,6))
+n7 <- c(rep(0,3), rep(1,7))
+n8 <- c(rep(0,2), rep(1,8))
+n9 <- c(rep(0,1), rep(1,9))
+n10 <- c(rep(1,10))
+
+n <- cbind(n1,n2,n3,n4,n5,n6,n7,n8,n9,n10)
+
+n_level <- 10 
+sim_nr <- 1
+i <- 1
+k <- 1 
+j <- 1
+
+
+```
+
+
+```{r weights function}
+
+weights <- function(n, sim_nr, n_level){
+  
+  df <- data.frame(NR = 1:100, sim_nr = rep(1:sim_nr, each = n_level), level = NA, partner_level = NA, new_points = NA)
+
+  #browser()
+  
+  for (i in 1:n_level){
+    x <- sample(n[,i], replace=F, size=n_level)
+    
+    b <- (i-1)*10
+    t <- i*10
+    
+    xdf <- subset(df, NR > b & NR <= t)
+    xdf_rest1 <- subset(df, NR <= b)
+    xdf_rest2 <- subset(df, NR > t)
+    xdf_rest <- rbind(xdf_rest1, xdf_rest2)
+    
+    xdf$level <- sum(x)
+    
+   for (j in 1:n_level){
+     y <- sample(n[,j], replace=F, size=n_level)
+     
+     xy <- data.frame(x,y)
+     
+     val_x <- sum(x)
+     
+     if (val_x == 1 | val_x == 2 | val_x == 3){
+       prob <- c(0.5, 0.5)
+     }
+     
+     if (val_x == 4 | val_x == 5 | val_x == 6){
+       prob <- c(0.6, 0.4)
+     }
+     
+     if (val_x == 7 | val_x == 8 | val_x == 9){
+       prob <- c(0.75, 0.25)
+     }
+     
+     if (val_x == 10){
+       prob <- c(0.9, 0.1)
+     }
+     
+     value <- 0
+     
+     for (k in 1:n_level){
+       answer <- sample(xy[k,], prob = prob, replace=F, size=1)
+       
+       value <- value + answer
+     }
+     
+     xdf$new_points[j] <- value
+     
+     xdf$partner_level[j] <- sum(y)
+     
+     df <- rbind(xdf, xdf_rest)
+   }
+  }
+     
+
+  
+  return(df)
+}
+
+rep_weights <- function(n, sim_nr, n_level, repitions){
+  d <- data.frame()
+  
+  for (i in 1:repitions){
+    w <- weights(n=n, sim_nr = sim_nr, n_level = n_level)
+    
+    w$sim_nr <- i
+    
+    d <- rbind(w,d)
+    
+  }
+  
+  df <- data.frame(level = 1:10)
+  
+  
+  ######### LOW AGENTS ######## 
+  
+  low_low <- d %>%
+    subset(level == 1 | level == 2 | level == 3) %>% 
+    subset(partner_level == 1 | partner_level == 2 | partner_level == 3) 
+  
+  low_low$new_points <- as.character(low_low$new_points)
+  
+  low_low <- low_low %>%
+    group_by(new_points) %>% 
+    count()
+  
+  low_low <- rename(low_low, low_low = n)
+  
+  low_low <- subset(low_low, new_points > 0)
+  
+  df <- merge(df, low_low, by.x = "level", by.y = "new_points" , all.x = T)
+
+    
+  low_mid <- d %>%
+    subset(level == 1 | level == 2 | level == 3) %>% 
+    subset(partner_level == 4 | partner_level == 5 | partner_level == 6) 
+  
+  low_mid$new_points <- as.character(low_mid$new_points)
+  
+  low_mid <- low_mid %>%
+    group_by(new_points) %>% 
+    count()
+  
+  low_mid <- rename(low_mid, low_mid = n)
+  
+  low_mid <- subset(low_mid, new_points > 0)
+  
+  df <- merge(df, low_mid, by.x = "level", by.y = "new_points" , all.x = T)
+  
+  
+  low_high <- d %>%
+    subset(level == 1 | level == 2 | level == 3) %>% 
+    subset(partner_level == 7 | partner_level == 8 | partner_level == 9) 
+  
+  low_high$new_points <- as.character(low_high$new_points)
+  
+  low_high <- low_high %>%
+    group_by(new_points) %>% 
+    count()
+  
+  low_high <- rename(low_high, low_high = n)
+  
+  low_high <- subset(low_high, new_points > 0)
+  
+  df <- merge(df, low_high, by.x = "level", by.y = "new_points" , all.x = T)
+  
+  
+  low_top <- d %>%
+    subset(level == 1 | level == 2 | level == 3) %>% 
+    subset(partner_level == 10) 
+  
+  low_top$new_points <- as.character(low_top$new_points)
+  
+  low_top <- low_top %>%
+    group_by(new_points) %>% 
+    count()
+  
+  low_top <- rename(low_top, low_top = n)
+  
+  low_top <- subset(low_top, new_points > 0)
+  
+  df <- merge(df, low_top, by.x = "level", by.y = "new_points" , all.x = T)
+  
+  
+  ###### MID AGENTS ###############
+  
+  mid_low <- d %>%
+    subset(level == 4 | level == 5 | level == 6) %>% 
+    subset(partner_level == 1 | partner_level == 2 | partner_level == 3) 
+  
+  mid_low$new_points <- as.character(mid_low$new_points)
+  
+  mid_low <- mid_low %>%
+    group_by(new_points) %>% 
+    count()
+  
+  mid_low <- rename(mid_low, mid_low = n)
+  
+  mid_low <- subset(mid_low, new_points > 0)
+  
+  df <- merge(df, mid_low, by.x = "level", by.y = "new_points" , all.x = T)
+
+    
+  mid_mid <- d %>%
+    subset(level == 4 | level == 5 | level == 6) %>% 
+    subset(partner_level == 4 | partner_level == 5 | partner_level == 6) 
+  
+  mid_mid$new_points <- as.character(mid_mid$new_points)
+  
+  mid_mid <- mid_mid %>%
+    group_by(new_points) %>% 
+    count()
+  
+  mid_mid <- rename(mid_mid, mid_mid = n)
+  
+  mid_mid <- subset(mid_mid, new_points > 0)
+  
+  df <- merge(df, mid_mid, by.x = "level", by.y = "new_points" , all.x = T)
+  
+  
+  mid_high <- d %>%
+    subset(level == 4 | level == 5 | level == 6) %>% 
+    subset(partner_level == 7 | partner_level == 8 | partner_level == 9) 
+  
+  mid_high$new_points <- as.character(mid_high$new_points)
+  
+  mid_high <- mid_high %>%
+    group_by(new_points) %>% 
+    count()
+  
+  mid_high <- rename(mid_high, mid_high = n)
+  
+  mid_high <- subset(mid_high, new_points > 0)
+  
+  df <- merge(df, mid_high, by.x = "level", by.y = "new_points" , all.x = T)
+  
+  
+  mid_top <- d %>%
+    subset(level == 4 | level == 5 | level == 6) %>% 
+    subset(partner_level == 10) 
+  
+  mid_top$new_points <- as.character(mid_top$new_points)
+  
+  mid_top <- mid_top %>%
+    group_by(new_points) %>% 
+    count()
+  
+  mid_top <- rename(mid_top, mid_top = n)
+  
+  mid_top <- subset(mid_top, new_points > 0)
+  
+  df <- merge(df, mid_top, by.x = "level", by.y = "new_points" , all.x = T)
+  
+    
+  ###### HIGH AGENTS ###############
+  
+  high_low <- d %>%
+    subset(level == 7 | level == 8 | level == 9) %>% 
+    subset(partner_level == 1 | partner_level == 2 | partner_level == 3) 
+  
+  high_low$new_points <- as.character(high_low$new_points)
+  
+  high_low <- high_low %>%
+    group_by(new_points) %>% 
+    count()
+  
+  high_low <- rename(high_low, high_low = n)
+  
+  high_low <- subset(high_low, new_points > 0)
+  
+  df <- merge(df, high_low, by.x = "level", by.y = "new_points" , all.x = T)
+
+    
+  high_mid <- d %>%
+    subset(level == 7 | level == 8 | level == 9) %>% 
+    subset(partner_level == 4 | partner_level == 5 | partner_level == 6) 
+  
+  high_mid$new_points <- as.character(high_mid$new_points)
+  
+  high_mid <- high_mid %>%
+    group_by(new_points) %>% 
+    count()
+  
+  high_mid <- rename(high_mid, high_mid = n)
+  
+  high_mid <- subset(high_mid, new_points > 0)
+  
+  df <- merge(df, high_mid, by.x = "level", by.y = "new_points" , all.x = T)
+  
+  
+  high_high <- d %>%
+    subset(level == 7 | level == 8 | level == 9) %>% 
+    subset(partner_level == 7 | partner_level == 8 | partner_level == 9) 
+  
+  high_high$new_points <- as.character(high_high$new_points)
+  
+  high_high <- high_high %>%
+    group_by(new_points) %>% 
+    count()
+  
+  high_high <- rename(high_high, high_high = n)
+  
+  high_high <- subset(high_high, new_points > 0)
+  
+  df <- merge(df, high_high, by.x = "level", by.y = "new_points" , all.x = T)
+  
+  
+  high_top <- d %>%
+    subset(level == 7 | level == 8 | level == 9) %>% 
+    subset(partner_level == 10) 
+  
+  high_top$new_points <- as.character(high_top$new_points)
+  
+  high_top <- high_top %>%
+    group_by(new_points) %>% 
+    count()
+  
+  high_top <- rename(high_top, high_top = n)
+  
+  high_top <- subset(high_top, new_points > 0)
+  
+  df <- merge(df, high_top, by.x = "level", by.y = "new_points" , all.x = T)
+  
+  ### top agents ###
+# top_low #
+top_low <- d %>%
+    subset(level == 10) %>% 
+    subset(partner_level == 1 | partner_level == 2 | partner_level == 3) 
+  
+  top_low$new_points <- as.character(top_low$new_points)
+  
+  top_low <- top_low %>%
+    group_by(new_points) %>% 
+    count()
+  
+  top_low <- rename(top_low, top_low = n)
+  
+  top_low <- subset(top_low, new_points > 0)
+  
+  df <- merge(df, top_low, by.x = "level", by.y = "new_points" , all.x = T)
+
+    
+  top_mid <- d %>%
+    subset(level == 10) %>% 
+    subset(partner_level == 4 | partner_level == 5 | partner_level == 6) 
+  
+  top_mid$new_points <- as.character(top_mid$new_points)
+  
+  top_mid <- top_mid %>%
+    group_by(new_points) %>% 
+    count()
+  
+  top_mid <- rename(top_mid, top_mid = n)
+  
+  top_mid <- subset(top_mid, new_points > 0)
+  
+  df <- merge(df, top_mid, by.x = "level", by.y = "new_points" , all.x = T)
+  
+  
+  top_high <- d %>%
+    subset(level == 10) %>% 
+    subset(partner_level == 7 | partner_level == 8 | partner_level == 9) 
+  
+  top_high$new_points <- as.character(top_high$new_points)
+  
+  top_high <- top_high %>%
+    group_by(new_points) %>% 
+    count()
+  
+  top_high <- rename(top_high, top_high = n)
+  
+  top_high <- subset(top_high, new_points > 0)
+  
+  df <- merge(df, top_high, by.x = "level", by.y = "new_points" , all.x = T)
+  
+  
+  top_top <- d %>%
+    subset(level == 10) %>% 
+    subset(partner_level == 10) 
+  
+  top_top$new_points <- as.character(top_top$new_points)
+  
+  top_top <- top_top %>%
+    group_by(new_points) %>% 
+    count()
+  
+  top_top <- rename(top_top, top_top = n)
+  
+  top_top <- subset(top_top, new_points > 0)
+  
+  df <- merge(df, top_top, by.x = "level", by.y = "new_points" , all.x = T) 
+  
+  
+  return(df)
+  
+}
+
+
+```
+
+
+
+```{r running and saving the weights}
+a <- rep_weights(n=n, sim_nr = 1, n_level = 10, repitions = 2000)
+
+# only run if we need more to support the weights 
+
+
+weight <- a  #### plus mere hvis vi kører flere
+
+weight[is.na(weight)] <- 0
+
+weight$low_low <- weight$low_low / sum(weight$low_low)
+weight$low_mid <- weight$low_mid / sum(weight$low_mid)
+weight$low_high <- weight$low_high / sum(weight$low_high)
+weight$low_top <- weight$low_top / sum(weight$low_top)
+weight$mid_low <- weight$mid_low / sum(weight$mid_low)
+weight$mid_mid <- weight$mid_mid / sum(weight$mid_mid)
+weight$mid_high <- weight$mid_high / sum(weight$mid_high)
+weight$mid_top <- weight$mid_top / sum(weight$mid_top)
+weight$high_low <- weight$high_low / sum(weight$high_low)
+weight$high_mid <- weight$high_mid / sum(weight$high_mid)
+weight$high_high <- weight$high_high / sum(weight$high_high)
+weight$high_top <- weight$high_top / sum(weight$high_top)
+weight$top_low <- weight$top_low / sum(weight$top_low)
+weight$top_mid <- weight$top_mid / sum(weight$top_mid)
+weight$top_high <- weight$top_hig / sum(weight$top_hig)
+weight$top_top <- weight$top_top / sum(weight$top_top)
+
+saveRDS(weight, file = "weight1.rds")
+```
+

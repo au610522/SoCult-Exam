@@ -1,0 +1,52 @@
+---
+title: "Running the ABM"
+author: "Josephine S Brunsgaard"
+date: "5/4/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(pacman)
+p_load(tidyverse, 
+       dplyr,
+       tibble,
+       brms)
+
+p_load(truncnorm)
+```
+
+## What to do
+
+Remember to run the functions in ABM SocKult Functions
+Weights are already saved
+
+```{r Groups}
+#Create a list with the groups
+
+
+g1 <- c(5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5) # all in the middle
+g2 <- c(5, 2, 5, 5, 4, 6, 6, 5, 6, 6 ,4, 5, 5, 6, 7, 4, 5, 4, 3, 5, 6, 6, 5, 5, 4, 6, 6, 4) # mean of 5, sd of 1.08
+g3 <- c(6, 6, 5, 3, 4, 10, 1, 4, 6, 7, 4, 4, 2, 4, 8, 5, 7, 3, 9, 5, 3, 5, 5, 2, 8, 7, 2, 5) # rnorm - sd 2.2
+g4 <-c(1, 1, 1, 2, 2, 2, 3, 3, 3,4, 4, 4, 4, 5,5, 5, 5, 6, 6,6 ,7, 7, 8, 8,9, 9, 10, 10) #mean = 5, most with low expertise, uniform
+g5 <- c(1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,9,9,9,9,9,9,9,9,9,9,9,10, 10) # no middle, bimodal
+
+
+
+groups <- cbind(g1,g2, g3, g4, g5)
+
+
+```
+
+##
+
+```{r Running the function}
+d <- simulation(N = 28, rounds = 10, max_points_pr_round = 10, groups = groups,n_groups = 5, sim_pr_group = 5)
+```
+
+
+## PLOTS
+
+```{r}
+
+```
+
