@@ -41,6 +41,7 @@ simulation <- function(N, rounds, max_points_pr_round, groups, n_groups, sim_pr_
       current$ID <- current$ID + j*1000
       
       current$group_type <- j
+      current$sim_nr <- j*100 + 1
       
       df <- rbind(df, current)
     }
