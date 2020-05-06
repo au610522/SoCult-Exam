@@ -15,6 +15,10 @@ p_load(tidyverse,
        brms)
 
 p_load(truncnorm, patchwork)
+
+
+setwd("~/Social and cultural dynamics in Cognition/SoCult-Exam/Exam")
+
 ```
 
 ## What to do
@@ -36,13 +40,15 @@ sd(g5)
 
 groups <- cbind(g1,g2, g3, g4, g5)
 
-
 ```
 
 ##
 
 ```{r Running the function}
-d <- simulation(N = 28, rounds = 10, max_points_pr_round = 10, groups = groups,n_groups = 5, sim_pr_group = 5)
+set.seed(100, kind=NULL, normal.kind = NULL)
+d <- simulation(N = 28, rounds = 10, max_points_pr_round = 10, groups = groups,n_groups = 5, sim_pr_group = 100)
+
+write.csv(d, "data.csv")
 ```
 
 
@@ -53,6 +59,10 @@ d$group_type <- as.character(d$group_type)
 d$sim_nr <- as.character(d$sim_nr)
 d$round <- as.numeric(d$round)
 d$current_points <- as.numeric(d$current_points)
+d$expertise_level_start <- factor(d$expertise_level_start, levels = c("low", "mid", "high", "top"))
+d$expertise_level <- as.character(d$expertise_level)
+
+d$change_exp_points <- d$current_points - d$prev_points - d$start_points
 ```
 
 
@@ -62,19 +72,19 @@ d$current_points <- as.numeric(d$current_points)
 
 # H1: Groups with a more diverse distribution of expertise points will have an overall better outcome. We would therefore expect the groups with the highest standard deviation to perform the best.
 
-
+####### USING THE FOLLOWIN PLOT ! #############
 
 # plot 1: 
 subset_1 <- d %>% 
   group_by(group_type, round) %>%
   summarize("mean_current_points" = mean(current_points))
   
-plot_1 <- ggplot(subset_1, aes(round, mean_current_points, color = group_type)) + geom_line() + scale_x_discrete(name ="round", 
+plot_1 <- ggplot(subset_1, aes(round, mean_current_points, color = group_type)) + geom_line() + scale_x_discrete(name ="Round", 
                     limits=c("1","2","3", "4", "5", "6","7","8", "9", "10")) + 
-  ylab("mean current points") + 
-  ggtitle("Point development within group types over rounds") + 
-  ylim(0,100)
-
+  ylab("Mean current points") + 
+  ggtitle("Development of Points Within Group Types Over Rounds") + 
+  ylim(0,100) + 
+  labs(col = "Group Type")
 
 
 #plot 2: 
@@ -84,7 +94,14 @@ subset_2 <- d %>%
   summarize("mean_current_points" = mean(current_points))
 
 plot_2 <- ggplot(subset_2,aes(x=round,y=mean_current_points))+
-  geom_point(aes(shape = expertise_level_start, color = group_type))
+  geom_point(aes(shape = expertise_level_start, color = group_type)) +
+  scale_x_discrete(name ="Round", 
+                    limits=c("1","2","3", "4", "5", "6","7","8", "9", "10")) + 
+  ylab("Mean current points") + 
+  ggtitle("Development of Points Within Group Types and Expertise Level Over Rounds") + 
+  ylim(0,100) +
+  labs(shape = "Stating level of expertise") +
+  labs(col = "Group type")
 
 
 plot_1 + plot_2
@@ -110,36 +127,88 @@ subset_3e <- d %>%
 
 
 plot_3a <- ggplot(subset_3a,aes(x=round,y=current_points))+
-  geom_point(aes(shape = expertise_level_start, col = group_type))+ 
+  geom_point(aes(col = expertise_level_start))+ 
   geom_smooth() + geom_errorbar(stat = "summary", fun.data = mean_se)
 
 
 plot_3b <- ggplot(subset_3b,aes(x=round,y=current_points))+
-  geom_point(aes(shape = expertise_level_start, col = group_type))+ 
+  geom_point(aes(col = expertise_level_start))+ 
   geom_smooth() + geom_errorbar(stat = "summary", fun.data = mean_se)
 
 plot_3c <- ggplot(subset_3c,aes(x=round,y=current_points))+
-  geom_point(aes(shape = expertise_level_start, col = group_type))+ 
+  geom_point(aes(col = expertise_level_start))+ 
   geom_smooth() + geom_errorbar(stat = "summary", fun.data = mean_se)
 
 plot_3d <- ggplot(subset_3d,aes(x=round,y=current_points))+
-  geom_point(aes(shape = expertise_level_start, col = group_type))+ 
+  geom_point(aes(col = expertise_level_start))+ 
   geom_smooth() + geom_errorbar(stat = "summary", fun.data = mean_se)
 
 plot_3e <- ggplot(subset_3e,aes(x=round,y=current_points))+
-  geom_point(aes(shape = expertise_level_start, col = group_type))+ 
+  geom_point(aes(col = expertise_level_start))+ 
   geom_smooth() + geom_errorbar(stat = "summary", fun.data = mean_se)
 
 
 plot_3a + plot_3b + plot_3c + plot_3d + plot_3e
 
 
-plot_3x <- ggplot(d,aes(x=round,y=current_points, shape = expertise_level_start, col = group_type))+
+
+############### A PLOT WE ARE GOING TO USE! ######################
+
+plot_3x <- ggplot(d,aes(x=round,y=current_points, col = expertise_level_start))+
   geom_point(stat = "summary", fun.data = mean_se)+ 
   geom_smooth(stat = "summary", fun.data = mean_se) + 
-  facet_wrap(~group_type)
+    scale_x_discrete(name ="Round", 
+                    limits=c("1","2","3", "4", "5", "6","7","8", "9", "10")) + 
+  ylab("Mean current points pr agent") + 
+  ggtitle("Development of Points Within Group Types and Expertise Level") + 
+  ylim(0,100) +
+  labs(col = "Level of expertise at the start of the simulation") +
+  theme(legend.position="top") +
+  facet_grid(~group_type)
 
+plot_3x
 
 ```
 
+```{r Hypothesis 2}
+
+p_1 <- ggplot(d,aes(x=round,y=change_exp_points, col = expertise_level_start))+
+  geom_point(stat = "summary", fun.data = mean_se)+ 
+  geom_smooth(stat = "summary", fun.data = mean_se) + 
+      scale_x_discrete(name ="Round", 
+                    limits=c("1","2","3", "4", "5", "6","7","8", "9", "10")) + 
+  ylab("Change in expertise points") + 
+  ggtitle("Change in expertise points compared the previous round") + 
+  labs(col = "Level of expertise at the start of the simulation") +
+  theme(legend.position="top") +
+  facet_grid(~group_type)
+
+p_1 
+
+p_2 <- ggplot(d,aes(x=round,y=change_exp_points, col = expertise_level_start))+
+  geom_point(stat = "summary", fun.data = mean_se)+ 
+  geom_smooth(stat = "summary", fun.data = mean_se)  
+  
+
+p_2
+```
+
+```{r}
+sub_1 <- d %>% 
+  group_by(round, group_type, expertise_level) %>% 
+  count(expertise_level)
+
+sub_1$expertise_level <- factor(sub_1$expertise_level, levels = c("low", "mid", "high", "top"))
+
+
+pl_1 <- ggplot(sub_1,aes(x=round, y=n, col = group_type)) +
+  geom_bar(stat = "summary",fun.y=mean, position="dodge")
+
+pl_2 <- ggplot(sub_1, aes(x=round, y=n, fill=expertise_level)) +
+  geom_bar(stat = "summary",fun.y=mean, position="dodge") +
+  facet_wrap( ~ group_type) ## FInd new colors 
+  
+
+
+```
 
