@@ -22,6 +22,8 @@ p_load(truncnorm)
 ```
 
 ```{r simulation function}
+## ID meaning: Sim_nr, Group_nr, Participant_nr
+
 
 simulation <- function(N, rounds, max_points_pr_round, groups, n_groups, sim_pr_group){
   
@@ -38,10 +40,10 @@ simulation <- function(N, rounds, max_points_pr_round, groups, n_groups, sim_pr_
     for (i in 1:sim_pr_group){
       current <- population(N=N, grouptype = group[,j], rounds = rounds, max_points_pr_round = max_points_pr_round, sim_nr = i)
       
-      current$ID <- current$ID + j*1000
+      current$ID <- current$ID + j*100
       
       current$group_type <- j
-      current$sim_nr <- j*100 + 1
+      current$sim_nr <- j + i*10
       
       df <- rbind(df, current)
     }
@@ -76,7 +78,7 @@ population <- function(N, points, grouptype, rounds, max_points_pr_round, sim_nr
 
   df <-  data.frame(ID = rep(1:N, rounds), round = rep(1:rounds, each = N), start_points = s.points$start_points, prev_points = NA, prev_exp_level = NA, current_points = NA, expertise_level = NA, expertise_level_start = s.points$expertise_level_start, group_id =NA, partner = NA, partner_prev_points = NA, partner_level = NA)
   
-  df$ID <- df$ID + 100*sim_nr
+  df$ID <- df$ID + 1000*sim_nr
   
   # Current points in round 1
 
@@ -106,7 +108,7 @@ population <- function(N, points, grouptype, rounds, max_points_pr_round, sim_nr
 
   # running the round
   i = 2
-  k = 1 + 100 * sim_nr
+  k = 1 + 1000 * sim_nr
   kn <- k + N
   
   for(i in 2:rounds){
@@ -450,4 +452,30 @@ current_points <- function(df, N){
 
 ```
 
+
+```{r function for calculating the sum of exp points per round for each simulation}
+sum_exp_points <- function(d, n_groups, sim_pr_group, rounds){
+  
+  #browser()
+  
+  sim_in_total <- n_groups * sim_pr_group *rounds
+  
+  d <- d %>% 
+    mutate(ID_new = group_indices_(d, .dots=c("sim_nr", "round"))) 
+  
+  i = 1
+  
+  for (i in 1:sim_in_total){
+    data <- subset(d, ID_new == i)
+    data$sum_exp_points_group <- sum(data$current_points)
+    
+    data_rest <- subset(d, ID_new != i)
+    
+    d <- rbind(data, data_rest)
+    
+  }
+  
+  return(d)
+}
+```
 

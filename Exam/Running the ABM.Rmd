@@ -8,15 +8,18 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
+# Loading library
+
 library(pacman)
 p_load(tidyverse, 
        dplyr,
        tibble,
-       brms)
+       brms,
+       lme4)
 
 p_load(truncnorm, patchwork)
 
-
+#Setting the working directory to where the data is placed - the "Exam" folder in the project.
 setwd("~/Social and cultural dynamics in Cognition/SoCult-Exam/Exam")
 
 ```
@@ -27,7 +30,7 @@ Remember to run the functions in ABM SocKult Functions
 Weights are already saved
 
 ```{r Groups}
-#Create a list with the groups
+#Create a list with the groups - only needed if you will run the whole simulation again
 
 
 g1 <- c(5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5) # all in the middle
@@ -45,46 +48,160 @@ groups <- cbind(g1,g2, g3, g4, g5)
 ##
 
 ```{r Running the function}
-set.seed(100, kind=NULL, normal.kind = NULL)
-d <- simulation(N = 28, rounds = 10, max_points_pr_round = 10, groups = groups,n_groups = 5, sim_pr_group = 100)
+## Running the simulation - run the functions first (ABM SocKult Functions.Rmd)
 
-write.csv(d, "data.csv")
+#d <- simulation(N = 28, rounds = 10, max_points_pr_round = 10, groups = groups,n_groups = 5, sim_pr_group = 100)
+
+#write.csv(d, "data.csv")
+
+# d$sum_exp_points_group <- NA
+ 
+# d <- sum_exp_points(d = d, n_groups = 5, sim_pr_group = 100, rounds = 10)
+
+
+#Loading the simulated data.
+d <- read.csv("data.csv")
+
+# Removing the "X1" column
+d <- d[,-1]
 ```
 
 
 ## Cleaning the data 
 
-```{r}
-d$group_type <- as.character(d$group_type)
-d$sim_nr <- as.character(d$sim_nr)
-d$round <- as.numeric(d$round)
-d$current_points <- as.numeric(d$current_points)
-d$expertise_level_start <- factor(d$expertise_level_start, levels = c("low", "mid", "high", "top"))
-d$expertise_level <- as.character(d$expertise_level)
+```{r Adjusting the data so it can be used in the plots}
 
-d$change_exp_points <- d$current_points - d$prev_points - d$start_points
+ d$current_points <- as.numeric(d$current_points)
+ d$expertise_level_start <- factor(d$expertise_level_start, levels = c("low", "mid", "high", "top"))
+ d$expertise_level <- as.character(d$expertise_level)
+ d$group_type <-  as.factor(d$group_type)
+
+ d$change_exp_points <- d$current_points - d$prev_points - d$start_points
+ 
+#Changing the name of the group types (just for looks)
+ 
+d_gt_1 <- subset(d, group_type == 1)
+d_gt_1$group_type <- "Group 1"
+d_gt_2 <- subset(d, group_type == 2)
+d_gt_2$group_type <- "Group 2"
+d_gt_3 <- subset(d, group_type == 3)
+d_gt_3$group_type <- "Group 3"
+d_gt_4 <- subset(d, group_type == 4)
+d_gt_4$group_type <- "Group 4"
+d_gt_5 <- subset(d, group_type == 5)
+d_gt_5$group_type <- "Group 5"
+
+d <- rbind(d_gt_1, d_gt_2, d_gt_3, d_gt_4, d_gt_5)
+
+ 
 ```
 
 
-## PLOTS 
+## PLOTS inkluded in the paper
 
-```{r Hypothesis 1}
+```{r}
 
-# H1: Groups with a more diverse distribution of expertise points will have an overall better outcome. We would therefore expect the groups with the highest standard deviation to perform the best.
+##Hypothesis 1 
 
-####### USING THE FOLLOWIN PLOT ! #############
+#Figure 1
+subset_1 <- d %>% 
+  group_by(group_type, round) %>%
+  summarize("mean_current_points" = mean(current_points))
 
-# plot 1: 
+subset_1$mean_current_points_per_round <- subset_1$mean_current_points/subset_1$round
+
+Figure_1 <- ggplot(subset_1, aes(round, mean_current_points_per_round, color = group_type)) + geom_line() + scale_x_discrete(name ="Round", 
+                    limits=c("1","2","3", "4", "5", "6","7","8", "9", "10")) + 
+  ylab("Average current points per round") + 
+  theme(legend.position="top") +
+  ggtitle("Figure 1: Development of Expertise Points, GT") + 
+  labs(col = "GT:")
+
+
+
+
+##Hypothesis 2a 
+
+#Figure 2
+Figure_2 <- ggplot(d,aes(x=round,y=change_exp_points, col = expertise_level_start))+
+  geom_point(stat = "summary", fun.data = mean_se)+ 
+  geom_smooth(stat = "summary", fun.data = mean_se)  +
+  scale_colour_brewer(palette="Dark2") +
+  scale_x_discrete(name ="Round", 
+                    limits=c("1","2","3", "4", "5", "6","7","8", "9", "10")) + 
+  ylab("Change in EP") + 
+  ggtitle("Figure 2: The Average Change in EP Across GT") + 
+  labs(col = "Start EL") +
+  theme(legend.position="top")
+
+
+
+
+##Hypothesis 2b 
+
+#Figure 3
+Figure_3 <- ggplot(d,aes(x=round,y=change_exp_points, col = expertise_level_start))+
+  geom_point(stat = "summary", fun.data = mean_se)+ 
+  geom_smooth(stat = "summary", fun.data = mean_se) + 
+      scale_x_discrete(name ="Round", 
+                    limits=c("1","2","3", "4", "5", "6","7","8", "9", "10")) + 
+  ylab("Change in EP") + 
+  ggtitle("Figure 3: Change in EP, GT and EL") + 
+  labs(col = "Start EL") +
+  theme(legend.position="top") +
+  facet_grid(~group_type) +
+  scale_colour_brewer(palette="Dark2") 
+
+
+
+```
+
+
+### Information for the tables
+```{r}
+# Table 2 
+Table_2 <- subset_1 %>% 
+  subset(round == 10) %>% 
+  summarize(mean_current_points_per_round)
+
+
+# Table 3
+Table_3 <- d %>% 
+  subset(round == 10) %>% 
+  group_by(group_type, expertise_level_start) %>% 
+  summarize(mean(change_exp_points))
+
+
+#Information for the table in appendix
+Table_app_start <- d %>% 
+  subset(round == 10) %>% 
+  group_by(group_type, expertise_level_start) %>%
+  count(expertise_level_start) 
+
+Table_app_r10 <- d %>% 
+  subset(round == 10) %>% 
+  group_by(group_type, expertise_level) %>%
+  count(expertise_level) 
+```
+
+
+
+
+#OTHER PLOTS, TABLES and THOUGHTS NOT USED IN THE PAPER
+
+```{r Other plots for hypothesis 1}
+
+# plot 1: Not using this plot 
 subset_1 <- d %>% 
   group_by(group_type, round) %>%
   summarize("mean_current_points" = mean(current_points))
   
 plot_1 <- ggplot(subset_1, aes(round, mean_current_points, color = group_type)) + geom_line() + scale_x_discrete(name ="Round", 
                     limits=c("1","2","3", "4", "5", "6","7","8", "9", "10")) + 
-  ylab("Mean current points") + 
-  ggtitle("Development of Points Within Group Types Over Rounds") + 
-  ylim(0,100) + 
-  labs(col = "Group Type")
+  ylab("Average current points") + 
+  theme(legend.position="top") +
+  ggtitle("Figure 1: Development of Expertise Points, GT") + 
+  labs(col = "GT")
 
 
 #plot 2: 
@@ -98,10 +215,11 @@ plot_2 <- ggplot(subset_2,aes(x=round,y=mean_current_points))+
   scale_x_discrete(name ="Round", 
                     limits=c("1","2","3", "4", "5", "6","7","8", "9", "10")) + 
   ylab("Mean current points") + 
-  ggtitle("Development of Points Within Group Types and Expertise Level Over Rounds") + 
+  ggtitle("Figure 1b: Development of Points, GT and EL") + 
   ylim(0,100) +
-  labs(shape = "Stating level of expertise") +
-  labs(col = "Group type")
+  labs(shape = "Starting EL") +
+    theme(legend.position="top") +
+  labs(col = "GT")
 
 
 plot_1 + plot_2
@@ -152,7 +270,19 @@ plot_3a + plot_3b + plot_3c + plot_3d + plot_3e
 
 
 
-############### A PLOT WE ARE GOING TO USE! ######################
+d_gt_1 <- subset(d, group_type == 1)
+d_gt_1$group_type <- "Group 1"
+d_gt_2 <- subset(d, group_type == 2)
+d_gt_2$group_type <- "Group 2"
+d_gt_3 <- subset(d, group_type == 3)
+d_gt_3$group_type <- "Group 3"
+d_gt_4 <- subset(d, group_type == 4)
+d_gt_4$group_type <- "Group 4"
+d_gt_5 <- subset(d, group_type == 5)
+d_gt_5$group_type <- "Group 5"
+
+d <- rbind(d_gt_1, d_gt_2, d_gt_3, d_gt_4, d_gt_5)
+
 
 plot_3x <- ggplot(d,aes(x=round,y=current_points, col = expertise_level_start))+
   geom_point(stat = "summary", fun.data = mean_se)+ 
@@ -160,11 +290,28 @@ plot_3x <- ggplot(d,aes(x=round,y=current_points, col = expertise_level_start))+
     scale_x_discrete(name ="Round", 
                     limits=c("1","2","3", "4", "5", "6","7","8", "9", "10")) + 
   ylab("Mean current points pr agent") + 
-  ggtitle("Development of Points Within Group Types and Expertise Level") + 
+  ggtitle("Figure 2: Development of Points, GT and EL") + 
   ylim(0,100) +
-  labs(col = "Level of expertise at the start of the simulation") +
+  labs(col = "Start Expertise Level") +
   theme(legend.position="top") +
-  facet_grid(~group_type)
+  facet_grid(~group_type) +
+  scale_colour_brewer(palette="Dark2") 
+
+plot_3x
+
+d$current_points_pr_round <- d$current_points/d$round
+
+plot_3x <- ggplot(d,aes(x=round,y=current_points_pr_round, col = expertise_level_start))+
+  geom_point(stat = "summary", fun.data = mean_se)+ 
+  geom_smooth(stat = "summary", fun.data = mean_se) + 
+    scale_x_discrete(name ="Round", 
+                    limits=c("1","2","3", "4", "5", "6","7","8", "9", "10")) + 
+  ylab("Mean current points pr agent") + 
+  ggtitle("Figure 2: Development of Points, GT and EL") + 
+  labs(col = "Start Expertise Level") +
+  theme(legend.position="top") +
+  facet_grid(~group_type) +
+  scale_colour_brewer(palette="Dark2") 
 
 plot_3x
 
@@ -177,20 +324,70 @@ p_1 <- ggplot(d,aes(x=round,y=change_exp_points, col = expertise_level_start))+
   geom_smooth(stat = "summary", fun.data = mean_se) + 
       scale_x_discrete(name ="Round", 
                     limits=c("1","2","3", "4", "5", "6","7","8", "9", "10")) + 
-  ylab("Change in expertise points") + 
-  ggtitle("Change in expertise points compared the previous round") + 
-  labs(col = "Level of expertise at the start of the simulation") +
+  ylab("Change in EP") + 
+  ggtitle("Figure 5: Change in EP, GT and EL") + 
+  labs(col = "Start EL") +
   theme(legend.position="top") +
-  facet_grid(~group_type)
+  facet_grid(~group_type) +
+  scale_colour_brewer(palette="Dark2") 
 
-p_1 
+
+p_1  # H2c
 
 p_2 <- ggplot(d,aes(x=round,y=change_exp_points, col = expertise_level_start))+
   geom_point(stat = "summary", fun.data = mean_se)+ 
-  geom_smooth(stat = "summary", fun.data = mean_se)  
+  geom_smooth(stat = "summary", fun.data = mean_se)  +
+  scale_colour_brewer(palette="Dark2") +
+  scale_x_discrete(name ="Round", 
+                    limits=c("1","2","3", "4", "5", "6","7","8", "9", "10")) + 
+  ylab("Change in EP") + 
+  ggtitle("Figure 4: The Average Change in EP Across GT") + 
+  labs(col = "Start EL") +
+  theme(legend.position="top")
+
+c <- d %>% 
+  subset(round == 10) %>% 
+  group_by(expertise_level_start) %>% 
+  summarize(mean(change_exp_points))
   
 
-p_2
+p_2 # H2b
+
+d$group_type <- as.factor(d$group_type)
+
+p_3 <- ggplot(d,aes(x=round,y=change_exp_points, col = group_type))+
+  geom_point(stat = "summary", fun.data = mean_se)+ 
+  geom_smooth(stat = "summary", fun.data = mean_se) + 
+      scale_x_discrete(name ="Round", 
+                    limits=c("1","2","3", "4", "5", "6","7","8", "9", "10")) + 
+  ylab("Change in EP") + 
+  ggtitle("Figure 5: Change in EP, GT and EL") + 
+  labs(col = "GT") +
+  theme(legend.position="top") +
+  facet_grid(~expertise_level_start)
+  
+
+p_3 #H2c 
+
+
+p_4 <- ggplot(d,aes(x=round,y=change_exp_points, col = group_type))+
+  geom_point(stat = "summary", fun.data = mean_se)+ 
+  geom_smooth(stat = "summary", fun.data = mean_se)  +
+  scale_x_discrete(name ="Round", 
+                    limits=c("1","2","3", "4", "5", "6","7","8", "9", "10")) + 
+  ylab("Change in expertise points") + 
+  ggtitle("Figure 3: The Average Change in EP") + 
+  labs(col = "Group Type") +
+  theme(legend.position="top") 
+
+p_4 #plot H2a
+
+change <- d %>% 
+  subset(round == 10) %>% 
+  group_by(group_type, expertise_level_start) %>% 
+  summarize(mean(change_exp_points))
+
+
 ```
 
 ```{r}
@@ -212,3 +409,90 @@ pl_2 <- ggplot(sub_1, aes(x=round, y=n, fill=expertise_level)) +
 
 ```
 
+
+```{r model for H1}
+
+#sum of exp points pr group 
+sg1 <- subset(d, group_type == 1 & round == 10)
+sum(sg1$current_points)/100/28/10
+sg1a <- sg1 %>% 
+  group_by(expertise_level_start,expertise_level) %>% 
+  count(expertise_level)
+
+sg1b <- sg1 %>% 
+  group_by(expertise_level) %>% 
+  count(expertise_level)
+
+sg1c <- sg1 %>% 
+  group_by(expertise_level_start) %>% 
+  count(expertise_level_start)
+
+sg2 <- subset(d, group_type == 2 & round == 10)
+sum(sg2$current_points)/100/28/10
+sg2a <- sg2 %>% 
+  group_by(expertise_level_start,expertise_level) %>% 
+  count(expertise_level)
+
+sg2b <- sg2 %>% 
+  group_by(expertise_level) %>% 
+  count(expertise_level)
+
+sg2c <- sg2 %>% 
+  group_by(expertise_level_start) %>% 
+  count(expertise_level_start)
+
+sg3 <- subset(d, group_type == 3 & round == 10)
+sum(sg3$current_points)/100/28/10
+sg3a <- sg3 %>% 
+  group_by(expertise_level_start,expertise_level) %>% 
+  count(expertise_level)
+
+sg3b <- sg3 %>% 
+  group_by(expertise_level) %>% 
+  count(expertise_level)
+
+sg3c <- sg3 %>% 
+  group_by(expertise_level_start) %>% 
+  count(expertise_level_start)
+
+
+sg4 <- subset(d, group_type == 4 & round == 10)
+sum(sg4$current_points)/100/28/10
+sg4a <- sg4 %>% 
+  group_by(expertise_level_start,expertise_level) %>% 
+  count(expertise_level)
+
+
+sg4b <- sg4 %>% 
+  group_by(expertise_level) %>% 
+  count(expertise_level)
+
+sg4c <- sg4 %>% 
+  group_by(expertise_level_start) %>% 
+  count(expertise_level_start)
+
+
+
+
+sg5 <- subset(d, group_type == 5 & round == 10)
+sum(sg5$current_points)/100/28/10
+sg5a <- sg5 %>% 
+  group_by(expertise_level_start,expertise_level) %>% 
+  count(expertise_level)
+
+sg5b <- sg5 %>% 
+  group_by(expertise_level) %>% 
+  count(expertise_level)
+
+sg5c <- sg5 %>% 
+  group_by(expertise_level_start) %>% 
+  count(expertise_level_start)
+
+
+
+plot <- ggplot(d,aes(x=round,y=sum_exp_points_group))+
+  geom_smooth(aes(col = group_type)) +
+  scale_x_discrete(name ="Round", 
+                    limits=c("1","2","3", "4", "5", "6","7","8", "9", "10")) 
+
+```
